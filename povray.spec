@@ -9,7 +9,8 @@ Group(de):	Applikationen/Grafik
 Group(pl):	Aplikacje/Grafika
 Source0:	ftp://ftp.povray.org/pub/povray/Official/Unix/povuni_s.tgz
 Source1:	ftp://ftp.povray.org/pub/povray/Official/Unix/povuni_d.tgz
-Source2:	pvmpov-3.1e2.tgz
+# pvm.patch is instead of that source, and its based on it
+#Source2:	pvmpov-3.1e2.tgz
 Patch0:		%{name}-makefile_and_config.patch
 Patch1:		%{name}-pvm.patch
 URL:		http://www.povray.org/
@@ -87,7 +88,7 @@ cd source/unix
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_bindir},/etc/skel,%{_mandir}/man1,%{_datadir}/povray31}
 
-install source/unix/{povray%{!?_without_x:,x-povray}%{!?_without_pvm:,pvmpov%{!?_without_x:,x-pvmpov}}} $RPM_BUILD_ROOT%{_bindir}
+install source/unix/%{?_without_x:povray}%{!?_without_x:{povray,x-povray}%{!?_without_pvm:,pvmpov%{!?_without_x:,x-pvmpov}}} $RPM_BUILD_ROOT%{_bindir}
 install source/unix/povrayrc $RPM_BUILD_ROOT/etc/skel/.povrayrc
 
 install povray.1 $RPM_BUILD_ROOT%{_mandir}/man1

@@ -6,21 +6,22 @@
 #
 # Conditional build:
 %bcond_without x	# - without X11 subpackage
-%bcond_without pvm	# - without PVM support
+%bcond_with pvm		# - with PVM support
 %bcond_with svga	# - with svgalib support (doesn't work on many platforms)
 #
-%define		snap 20030110
+%define		_src_pov_ver	3.6
+
 Summary:	Persistence of Vision Ray Tracer
 Summary(pl):	Persistence of Vision Ray Tracer
 Name:		povray
-Version:	3.50c
-Release:	3
+Version:	3.6.1
+Release:	0.5
 License:	distributable
 Group:		Applications/Graphics
-#Source0:	ftp://ftp.povray.org/pub/povray/Official/Unix/povuni_s.tgz
+Source0:	http://www.povray.org/ftp/pub/povray/Official/Unix/povray-%{_src_pov_ver}.tar.bz2
+# Source0-md5:	b5789bb7eeaed0809c5c82d0efda571d
 # based on sources from CVS at http://pvmpov.sourceforge.net/
-Source0:	%{name}-%{version}-%{snap}.tar.gz
-# Source0-md5:	4dc3a74c6182e9f9cb2fc46187fe7e6b
+# Source0:	%{name}-%{version}-%{snap}.tar.gz
 Patch0:		%{name}-legal.patch
 Patch1:		%{name}-64bit.patch
 Patch2:		%{name}-X-libs.patch
@@ -103,19 +104,20 @@ PVM/xwin.
 
 %prep
 %setup -q
-%patch1 -p1
-%patch2 -p1
+##%patch1 -p1
+##%patch2 -p1
 %if "%{_lib}" == "lib64"
-%patch3 -p1
+##%patch3 -p1
 %endif
 %if %{without svga}
-%patch4 -p1
+##%patch4 -p1
 %endif
 
 %build
 %{__aclocal}
 %{__autoconf}
 %{__automake}
+COMPILED_BY="xx";export COMPILED_BY;
 %if %{with x} && %{with pvm}
 %configure \
 	--libdir=%{_datadir} \
@@ -125,7 +127,7 @@ PVM/xwin.
 	--x-includes=/usr/X11R6/include \
 	--x-libraries=/usr/X11R6/%{_lib}
 %{__make}
-install src/povray x-pvmpov
+install unix/povray x-pvmpov
 %endif
 
 %if %{with pvm}
@@ -138,7 +140,7 @@ install src/povray x-pvmpov
 	--with-pvm-libs=%{_libdir} \
 	--without-x
 %{__make}
-install src/povray pvmpov
+install unix/povray pvmpov
 %endif
 
 %if %{with x}
@@ -147,7 +149,7 @@ install src/povray pvmpov
 	--x-includes=/usr/X11R6/include \
 	--x-libraries=/usr/X11R6/%{_lib} 
 %{__make}
-install src/povray x-povray
+install unix/povray x-povray
 %{__make} clean
 %endif
 
@@ -179,20 +181,21 @@ install pvmpov $RPM_BUILD_ROOT%{_bindir}/pvmpov
 ln -s %{_bindir}/pvmpov $RPM_BUILD_ROOT%{_pvmroot}/bin/%{_pvmarch}/pvmpov
 %endif
 
-install povray.ini $RPM_BUILD_ROOT%{_sysconfdir}
-install povray.conf $RPM_BUILD_ROOT%{_sysconfdir}
-ln -sf %{_sysconfdir}/povray.ini $RPM_BUILD_ROOT%{_datadir}/povray-3.5/povray.ini
+##install povray.ini $RPM_BUILD_ROOT%{_sysconfdir}
+##install povray.conf $RPM_BUILD_ROOT%{_sysconfdir}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS ChangeLog NEWS README* povlegal.doc *.txt doc/html
+%doc AUTHORS ChangeLog NEWS README* doc/povlegal.doc doc/*.txt doc/html
 %attr(755,root,root) %{_bindir}/povray
 %{_datadir}/povray*
+%{_docdir}/povray*
 %{_mandir}/man?/*
-%config(noreplace) %verify(not md5 size mtime) %{_sysconfdir}/povray.*
+%config(noreplace) %verify(not md5 size mtime) %{_sysconfdir}/%{name}/%{_src_pov_ver}/povray.*
+## %config(noreplace) %verify(not md5 size mtime) %{_sysconfdir}/povray.*
 
 %if %{with x}
 %files X11

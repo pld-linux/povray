@@ -2,12 +2,14 @@
 #
 # todo:
 #      patch for s#/usr/local#/usr# in povray.ini
+#      (no)svga version
 #
 
 # Conditional build:
 # _without_x	- without X11 subpackage
-# _without_pvm	- [temporarily disabled by default] without PVM support
+# _without_pvm	- without PVM support
 #
+%define		snap 20030110
 Summary:	Persistence of Vision Ray Tracer
 Summary(pl):	Persistence of Vision Ray Tracer
 Name:		povray
@@ -15,11 +17,12 @@ Version:	3.50c
 Release:	1
 License:	distributable
 Group:		Applications/Graphics
-Source0:	ftp://ftp.povray.org/pub/povray/Official/Unix/povuni_s.tgz
+#Source0:	ftp://ftp.povray.org/pub/povray/Official/Unix/povuni_s.tgz
+# based on sources from CVS at http://pvmpov.sourceforge.net/
+Source0:	%{name}-%{version}-%{snap}.tar.gz
 Source1:	%{name}-%{version}.md5sum
 Patch0:		%{name}-legal.patch
 Patch1:		%{name}-types.patch
-# pvm support not yet available - http://pvmpov.sourceforge.net/
 URL:		http://www.povray.org/
 BuildRequires:	libjpeg-devel
 BuildRequires:	libpng-devel >= 1.0.8
@@ -31,6 +34,8 @@ BuildRequires:	zlib-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_libdir		%{_datadir}
+%define		_pvmarch	%(/usr/bin/pvmgetarch)
+%define		_pvmroot	/usr/lib/pvm3/
 
 %description
 The Persistence of Vision(tm) Ray-Tracer creates three-dimensional,
@@ -92,11 +97,11 @@ Plik wykonywalny The Persistence of Vision(tm) Ray-Tracer dla
 PVM/xwin.
 
 %prep
-cd %{_sourcedir}
-md5sum -c %{name}-%{version}.md5sum
-cd -
+#cd %{_sourcedir}
+#md5sum -c %{name}-%{version}.md5sum
+#cd -
 %setup -q
-%patch0 -p1
+#%patch0 -p1
 %ifarch alpha
 %patch1 -p1
 %endif
@@ -105,6 +110,27 @@ cd -
 %{__aclocal}
 %{__autoconf}
 %{__automake}
+%if %{!?_without_pvm:%{!?_without_x:1}%{?_without_x:0}}%{?_without_pvm:0}
+%configure \
+	--enable-pvm \
+	--with-pvm-arch=%{_pvmarch} \
+	--x-includes=%{_prefix}/X11R6/include \
+	--x-libraries=%{_prefix}/X11R6/lib
+%{__make}
+install src/povray x-pvmpov
+%endif
+
+%if %{!?_without_pvm:1}%{?_without_pvm:0}
+%{__make} clean
+
+%configure \
+	--enable-pvm \
+	--with-pvm-arch=%{_pvmarch} \
+	--without-x
+%{__make}
+install src/povray pvmpov
+%endif
+
 %if %{!?_without_x:1}%{?_without_x:0}
 %configure \
 	--x-includes=%{_prefix}/X11R6/include \
@@ -118,15 +144,25 @@ install src/povray x-povray
 	--without-x
 %{__make}
 
+
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_sysconfdir},%{_prefix}/X11R6/bin}
+install -d $RPM_BUILD_ROOT{%{_sysconfdir},%{_prefix}/X11R6/bin} \
+	$RPM_BUILD_ROOT%{_pvmroot}/bin/%{_pvmarch}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
 %if %{!?_without_x:1}%{?_without_x:0}
 install x-povray $RPM_BUILD_ROOT%{_prefix}/X11R6/bin
+%endif
+
+%if %{!?_without_pvm:%{!?_without_x:1}%{?_without_x:0}}%{?_without_pvm:0}
+install x-pvmpov $RPM_BUILD_ROOT%{_pvmroot}/bin/%{_pvmarch}/x-pvmpov
+%endif
+
+%if %{!?_without_pvm:1}%{?_without_pvm:0}
+install pvmpov $RPM_BUILD_ROOT%{_pvmroot}/bin/%{_pvmarch}/pvmpov
 %endif
 
 install povray.ini $RPM_BUILD_ROOT%{_sysconfdir}
@@ -150,14 +186,14 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_prefix}/X11R6/bin/x-povray
 %endif
 
-#%if %{!?_without_pvm:1}%{?_without_pvm:0}
-#%files pvm
-#%defattr(644,root,root,755)
-#%attr(755,root,root) %{_pvm_root}/bin/%{_pvm_arch}/pvmpov
-#
-#%if %{!?_without_x:1}%{?_without_x:0}
-#%files pvm-X11
-#%defattr(644,root,root,755)
-#%attr(755,root,root) %{_pvm_root}/bin/%{_pvm_arch}/x-pvmpov
-#%endif
-#%endif
+%if %{!?_without_pvm:1}%{?_without_pvm:0}
+%files pvm
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_pvmroot}/bin/%{_pvmarch}/pvmpov
+%endif
+
+%if %{!?_without_pvm:%{!?_without_x:1}%{?_without_x:0}}%{?_without_pvm:0}
+%files pvm-X11
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_pvmroot}/bin/%{_pvmarch}/x-pvmpov
+%endif

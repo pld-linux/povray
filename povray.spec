@@ -51,7 +51,7 @@ The Persistence of Vision(tm) Ray-Tracer X Window executable.
 
 %build
 cd source/unix
-make newunix newxwin OPT_FLAGS="$RPM_OPT_FLAGS"
+%{__make} newunix newxwin OPT_FLAGS="$RPM_OPT_FLAGS"
 
 %install
 rm -rf $RPM_BUILD_ROOT

@@ -3,7 +3,7 @@ Summary(pl):	Persistence of Vision Ray Tracer
 Name:		povray
 Version:	3.1g
 Release:	5
-License:	distrituable
+License:	distributable
 Group:		Applications/Graphics
 Source0:	ftp://ftp.povray.org/pub/povray/Official/Unix/povuni_s.tgz
 Source1:	ftp://ftp.povray.org/pub/povray/Official/Unix/povuni_d.tgz

@@ -23,18 +23,20 @@ Source0:	%{name}-%{version}-%{snap}.tar.gz
 # Source0-md5: 4dc3a74c6182e9f9cb2fc46187fe7e6b
 Patch0:		%{name}-legal.patch
 URL:		http://www.povray.org/
+%{!?_without_x:BuildRequires:XFree86-devel}
+BuildRequires:	autoconf
+BuildRequires:	automake
 BuildRequires:	libjpeg-devel
 BuildRequires:	libpng-devel >= 1.0.8
 BuildRequires:	libstdc++-devel
 BuildRequires:	libtiff-devel
-BuildRequires:	zlib-devel
-%{!?_without_x:BuildRequires:XFree86-devel}
 %{!?_without_pvm:BuildRequires:pvm-devel >= 3.4.3-24 }
+BuildRequires:	zlib-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_libdir		%{_datadir}
 %define		_pvmarch	%(/usr/bin/pvmgetarch)
-%define		_pvmroot	/usr/lib/pvm3/
+%define		_pvmroot	/usr/lib/pvm3
 
 %description
 The Persistence of Vision(tm) Ray-Tracer creates three-dimensional,
@@ -106,8 +108,8 @@ PVM/xwin.
 %configure \
 	--enable-pvm \
 	--with-pvm-arch=%{_pvmarch} \
-	--x-includes=%{_prefix}/X11R6/include \
-	--x-libraries=%{_prefix}/X11R6/lib
+	--x-includes=/usr/X11R6/include \
+	--x-libraries=/usr/X11R6/lib
 %{__make}
 install src/povray x-pvmpov
 %endif
@@ -125,8 +127,8 @@ install src/povray pvmpov
 
 %if %{!?_without_x:1}%{?_without_x:0}
 %configure \
-	--x-includes=%{_prefix}/X11R6/include \
-	--x-libraries=%{_prefix}/X11R6/lib
+	--x-includes=/usr/X11R6/include \
+	--x-libraries=/usr/X11R6/lib
 %{__make}
 install src/povray x-povray
 %{__make} clean
@@ -139,7 +141,7 @@ install src/povray x-povray
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_sysconfdir},%{_prefix}/X11R6/bin} \
+install -d $RPM_BUILD_ROOT{%{_sysconfdir},/usr/X11R6/bin} \
 	$RPM_BUILD_ROOT%{_pvmroot}/bin/%{_pvmarch}
 
 %{__make} install \

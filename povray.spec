@@ -15,7 +15,8 @@ Patch1:		%{name}-pvm.patch
 URL:		http://www.povray.org/
 BuildRequires:	zlib-devel
 BuildRequires:	libpng >= 1.0.8
-%{!?_with_pvm:BuildRequires:XFree86-devel}
+%{!?_without_x:BuildRequires:XFree86-devel}
+%{!?_without_pvm:BuildRequires:pvm-devel}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -38,27 +39,40 @@ pliku tekstowym. Ray-tracing nie pozwala na szybkie tworzenie obrazów,
 ale za to twórca otrzymuje wyskokiej jako¶ci bitmapy z realistycznymi
 efektami, tj. odbicia ¶wiat³a, cienie, perspektywa i inne.
 
-%package X11
-Summary:	X Window povray executable
-Summary(pl):	povray pod X Window
-Group:		Applications/Graphics
-Group(de):	Applikationen/Grafik
-Group(pl):	Aplikacje/Grafika
-Requires:	%{name} = %{version}
+%{!?_without_x:%package X11}
+%{!?_without_x:Summary:	X Window povray executable}
+%{!?_without_x:Summary(pl):	povray pod X Window}
+%{!?_without_x:Group:		Applications/Graphics}
+%{!?_without_x:Group(de):	Applikationen/Grafik}
+%{!?_without_x:Group(pl):	Aplikacje/Grafika}
+%{!?_without_x:Requires:	%{name} = %{version}}
 
-%description X11
-The Persistence of Vision(tm) Ray-Tracer X Window executable.
+%{!?_without_x:%description X11}
+%{!?_without_x:The Persistence of Vision(tm) Ray-Tracer X Window executable.}
 
 
-%package pvm
-Summary:	PVM/newunix povray executable
-Group:		Applications/Graphics
-Group(de):	Applikationen/Grafik
-Group(pl):	Aplikacje/Grafika
-Requires:	%{name} = %{version}
+%{!?_without_pvm:%package pvm}
+%{!?_without_pvm:Summary:	PVM/unix povray executable}
+%{!?_without_pvm:Group:		Applications/Graphics}
+%{!?_without_pvm:Group(de):	Applikationen/Grafik}
+%{!?_without_pvm:Group(pl):	Aplikacje/Grafika}
+%{!?_without_pvm:Requires:	%{name} = %{version}}
 
-%description pvm
-The Persistence of Vision(tm) Ray-Tracer PVM/newunix executable.
+%{!?_without_pvm:%description pvm}
+%{!?_without_pvm:The Persistence of Vision(tm) Ray-Tracer PVM/unix executable.}
+
+
+%{!?_without_pvm:%{!?_without_x:%package pvm-X11}}
+%{!?_without_pvm:%{!?_without_x:Summary:	PVM/xwin povray executable}}
+%{!?_without_pvm:%{!?_without_x:Group:		Applications/Graphics}}
+%{!?_without_pvm:%{!?_without_x:Group(de):	Applikationen/Grafik}}
+%{!?_without_pvm:%{!?_without_x:Group(pl):	Aplikacje/Grafika}}
+%{!?_without_pvm:%{!?_without_x:Requires:	%{name} = %{version}}}
+
+%{!?_without_pvm:%{!?_without_x:%description pvm-X11}}
+%{!?_without_pvm:%{!?_without_x:The Persistence of Vision(tm) Ray-Tracer PVM/xwin executable.}}
+
+
 
 %prep
 %setup -q -n povray31 -b 1 
@@ -67,13 +81,13 @@ The Persistence of Vision(tm) Ray-Tracer PVM/newunix executable.
 
 %build
 cd source/unix
-%{__make} newunix newxwin newunix_pvm newxwin_pvm OPT_FLAGS="%{rpmcflags}"
+%{__make} newunix %{!?_without_x:newxwin} %{!?_without_pvm:newunix_pvm %{!?_without_x:newxwin_pvm}} OPT_FLAGS="%{rpmcflags}"
 
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_bindir},/etc/skel,%{_mandir}/man1,%{_datadir}/povray31}
 
-install source/unix/{povray,x-povray,pvmpov} $RPM_BUILD_ROOT%{_bindir}
+install source/unix/{povray%{!?_without_x:,x-povray}%{!?_without_pvm:,pvmpov%{!?_without_x:,x-pvmpov}}} $RPM_BUILD_ROOT%{_bindir}
 install source/unix/povrayrc $RPM_BUILD_ROOT/etc/skel/.povrayrc
 
 install povray.1 $RPM_BUILD_ROOT%{_mandir}/man1
@@ -94,10 +108,14 @@ rm -rf $RPM_BUILD_ROOT
 /etc/skel/.povrayrc
 %{_mandir}/man1/*
 
-%files X11
-%defattr(644,root,root,755)
-%attr(755,root,root) %{_bindir}/x-povray
+%{!?_without_x:%files X11}
+%{!?_without_x:%defattr(644,root,root,755)}
+%{!?_without_x:%attr(755,root,root) %{_bindir}/x-povray}
 
-%files pvm
-%defattr(644,root,root,755)
-%attr(755,root,root) %{_bindir}/pvmpov
+%{!?_without_pvm:%files pvm}
+%{!?_without_pvm:%defattr(644,root,root,755)}
+%{!?_without_pvm:%attr(755,root,root) %{_bindir}/pvmpov}
+
+%{!?_without_pvm:%{!?_without_x:%files pvm-X11}}
+%{!?_without_pvm:%{!?_without_x:%defattr(644,root,root,755)}}
+%{!?_without_pvm:%{!?_without_x:%attr(755,root,root) %{_bindir}/x-pvmpov}}

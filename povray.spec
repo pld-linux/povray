@@ -67,6 +67,7 @@ Window.
 
 %package pvm
 Summary:	PVM/unix povray executable
+Summary(pl):	Plik wykonywalny povray dla PVM/unix
 Group:		Applications/Graphics
 Requires:	%{name} = %{version}
 
@@ -79,6 +80,7 @@ PVM/unix.
 
 %package pvm-X11
 Summary:	PVM/xwin povray executable
+Summary(pl):	Plik wykonywalny povray dla PVM/xwin
 Group:		Applications/Graphics
 Requires:	%{name} = %{version}
 

@@ -64,7 +64,7 @@ cp -r allscene include scenes $RPM_BUILD_ROOT%{_datadir}/povray31
 install *.ini *.pov $RPM_BUILD_ROOT%{_datadir}/povray31
 
 gzip -9nf gamma.gif.txt povlegal.doc povuser.txt \
-	%{_mandir}/man1/*
+	$RPM_BUILD_ROOT%{_mandir}/man1/*
 
 %clean
 rm -rf $RPM_BUILD_ROOT

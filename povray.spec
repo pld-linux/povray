@@ -6,15 +6,15 @@
 #
 
 # Conditional build:
-# _without_x	- without X11 subpackage
-# _without_pvm	- without PVM support
-#
+%bcond_without x	# - without X11 subpackage
+%bcond_without pvm	# - without PVM support
+
 %define		snap 20030110
 Summary:	Persistence of Vision Ray Tracer
 Summary(pl):	Persistence of Vision Ray Tracer
 Name:		povray
 Version:	3.50c
-Release:	1
+Release:	2
 License:	distributable
 Group:		Applications/Graphics
 #Source0:	ftp://ftp.povray.org/pub/povray/Official/Unix/povuni_s.tgz
@@ -22,21 +22,23 @@ Group:		Applications/Graphics
 Source0:	%{name}-%{version}-%{snap}.tar.gz
 # Source0-md5: 4dc3a74c6182e9f9cb2fc46187fe7e6b
 Patch0:		%{name}-legal.patch
+Patch1:		%{name}-amd64.patch
+Patch2:		%{name}-X-libs.patch
+Patch3:		%{name}-lib64.patch
 URL:		http://www.povray.org/
-%{!?_without_x:BuildRequires:XFree86-devel}
+%{!?with_x:BuildRequires:XFree86-devel}
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	libjpeg-devel
 BuildRequires:	libpng-devel >= 1.0.8
 BuildRequires:	libstdc++-devel
 BuildRequires:	libtiff-devel
-%{!?_without_pvm:BuildRequires:pvm-devel >= 3.4.3-24 }
+%{!?with_pvm:BuildRequires:pvm-devel >= 3.4.3-24 }
 BuildRequires:	zlib-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define		_libdir		%{_datadir}
 %define		_pvmarch	%(/usr/bin/pvmgetarch)
-%define		_pvmroot	/usr/lib/pvm3
+%define		_pvmroot	/usr/%{_lib}/pvm3
 
 %description
 The Persistence of Vision(tm) Ray-Tracer creates three-dimensional,
@@ -99,42 +101,53 @@ PVM/xwin.
 
 %prep
 %setup -q
+%patch1 -p1
+%patch2 -p1
+%if "%{_lib}" == "lib64"
+%patch3 -p1
+%endif
 
 %build
 %{__aclocal}
 %{__autoconf}
 %{__automake}
-%if %{!?_without_pvm:%{!?_without_x:1}%{?_without_x:0}}%{?_without_pvm:0}
+%if %{with x} && %{with pvm}
 %configure \
+	--libdir=%{_datadir} \
 	--enable-pvm \
 	--with-pvm-arch=%{_pvmarch} \
+	--with-pvm-libs=%{_libdir} \
 	--x-includes=/usr/X11R6/include \
-	--x-libraries=/usr/X11R6/lib
+	--x-libraries=/usr/X11R6/%{_lib}
 %{__make}
 install src/povray x-pvmpov
 %endif
 
-%if %{!?_without_pvm:1}%{?_without_pvm:0}
+%if %{with pvm}
 %{__make} clean
 
 %configure \
+	--libdir=%{_datadir} \
 	--enable-pvm \
 	--with-pvm-arch=%{_pvmarch} \
+	--with-pvm-libs=%{_libdir} \
 	--without-x
 %{__make}
 install src/povray pvmpov
 %endif
 
-%if %{!?_without_x:1}%{?_without_x:0}
+%if %{with x}
 %configure \
+	--libdir=%{_datadir} \
 	--x-includes=/usr/X11R6/include \
-	--x-libraries=/usr/X11R6/lib
+	--x-libraries=/usr/X11R6/%{_lib} 
 %{__make}
 install src/povray x-povray
 %{__make} clean
 %endif
 
 %configure \
+	--libdir=%{_datadir} \
 	--without-x
 %{__make}
 
@@ -147,18 +160,18 @@ install -d $RPM_BUILD_ROOT{%{_sysconfdir},/usr/X11R6/bin} \
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-%if %{!?_without_x:1}%{?_without_x:0}
+%if %{with x}
 install x-povray $RPM_BUILD_ROOT%{_bindir}
 %endif
 
-%if %{!?_without_pvm:%{!?_without_x:1}%{?_without_x:0}}%{?_without_pvm:0}
+%if %{with x} && %{with pvm}
 install x-pvmpov $RPM_BUILD_ROOT%{_bindir}/x-pvmpov
-ln -s %{_binir}/x-pvmpov $RPM_BUILD_ROOT%{_pvmroot}/bin/%{_pvmarch}/x-pvmpov
+ln -s %{_bindir}/x-pvmpov $RPM_BUILD_ROOT%{_pvmroot}/bin/%{_pvmarch}/x-pvmpov
 %endif
 
-%if %{!?_without_pvm:1}%{?_without_pvm:0}
+%if %{with pvm}
 install pvmpov $RPM_BUILD_ROOT%{_bindir}/pvmpov
-ln -s %{_binir}/pvmpov $RPM_BUILD_ROOT%{_pvmroot}/bin/%{_pvmarch}/pvmpov
+ln -s %{_bindir}/pvmpov $RPM_BUILD_ROOT%{_pvmroot}/bin/%{_pvmarch}/pvmpov
 %endif
 
 install povray.ini $RPM_BUILD_ROOT%{_sysconfdir}
@@ -172,24 +185,24 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog NEWS README* povlegal.doc *.txt doc/html
 %attr(755,root,root) %{_bindir}/povray
-%{_libdir}/povray*
+%{_datadir}/povray*
 %{_mandir}/man?/*
 %config(noreplace) %verify(not md5 size mtime) %{_sysconfdir}/povray.*
 
-%if %{!?_without_x:1}%{?_without_x:0}
+%if %{with x}
 %files X11
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/x-povray
 %endif
 
-%if %{!?_without_pvm:1}%{?_without_pvm:0}
+%if %{with pvm} && %{with pvm}
 %files pvm
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_pvmroot}/bin/%{_pvmarch}/pvmpov
 %attr(755,root,root) %{_bindir}/pvmpov
 %endif
 
-%if %{!?_without_pvm:%{!?_without_x:1}%{?_without_x:0}}%{?_without_pvm:0}
+%if %{with pvm} && %{with x}
 %files pvm-X11
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_pvmroot}/bin/%{_pvmarch}/x-pvmpov

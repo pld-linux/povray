@@ -2,19 +2,19 @@
 #
 # todo:
 #      patch for s#/usr/local#/usr# in povray.ini
-#      (no)svga version
 #
 #
 # Conditional build:
 %bcond_without x	# - without X11 subpackage
 %bcond_without pvm	# - without PVM support
+%bcond_with svga	# - with svgalib support (doesn't work on many platforms)
 #
 %define		snap 20030110
 Summary:	Persistence of Vision Ray Tracer
 Summary(pl):	Persistence of Vision Ray Tracer
 Name:		povray
 Version:	3.50c
-Release:	2
+Release:	3
 License:	distributable
 Group:		Applications/Graphics
 #Source0:	ftp://ftp.povray.org/pub/povray/Official/Unix/povuni_s.tgz
@@ -22,18 +22,20 @@ Group:		Applications/Graphics
 Source0:	%{name}-%{version}-%{snap}.tar.gz
 # Source0-md5: 4dc3a74c6182e9f9cb2fc46187fe7e6b
 Patch0:		%{name}-legal.patch
-Patch1:		%{name}-amd64.patch
+Patch1:		%{name}-64bit.patch
 Patch2:		%{name}-X-libs.patch
 Patch3:		%{name}-lib64.patch
+Patch4:		%{name}-no_svgalib.patch
 URL:		http://www.povray.org/
-%{!?with_x:BuildRequires:XFree86-devel}
+%{?with_x:BuildRequires:	XFree86-devel}
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	libjpeg-devel
 BuildRequires:	libpng-devel >= 1.0.8
 BuildRequires:	libstdc++-devel
 BuildRequires:	libtiff-devel
-%{!?with_pvm:BuildRequires:pvm-devel >= 3.4.3-24 }
+%{?with_pvm:BuildRequires:	pvm-devel >= 3.4.3-24}
+%{?with_svga:BuildRequires:	svgalib-devel}
 BuildRequires:	zlib-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -105,6 +107,9 @@ PVM/xwin.
 %patch2 -p1
 %if "%{_lib}" == "lib64"
 %patch3 -p1
+%endif
+%if %{without svga}
+%patch4 -p1
 %endif
 
 %build

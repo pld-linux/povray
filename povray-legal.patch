@@ -7,7 +7,7 @@ diff -urN povray-3.50a.org/src/optout.h povray-3.50a/src/optout.h
  #define DISTRIBUTION_MESSAGE_1 "This is an unofficial version compiled by:"
 -#error You must complete the following DISTRIBUTION_MESSAGE macro
 -#define DISTRIBUTION_MESSAGE_2 " FILL IN NAME HERE........................."
-+#define DISTRIBUTION_MESSAGE_2 " PLD/Linux Team <feedback@pld.org.pl>"
++#define DISTRIBUTION_MESSAGE_2 " PLD/Linux Team <feedback@pld-linux.org>"
  #define DISTRIBUTION_MESSAGE_3 " The POV-Ray Team(tm) is not responsible for supporting this version."
  
  /* Number of help pages (numbered 0 to MAX_HELP_PAGE). */

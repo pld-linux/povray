@@ -5,8 +5,6 @@ Version:	3.1g
 Release:	5
 License:	distrituable
 Group:		Applications/Graphics
-Group(de):	Applikationen/Grafik
-Group(pl):	Aplikacje/Grafika
 Source0:	ftp://ftp.povray.org/pub/povray/Official/Unix/povuni_s.tgz
 Source1:	ftp://ftp.povray.org/pub/povray/Official/Unix/povuni_d.tgz
 # pvm.patch is instead of that source, and its based on it
@@ -51,8 +49,6 @@ efektami, tj. odbicia ¶wiat³a, cienie, perspektywa i inne.
 Summary:	X Window povray executable
 Summary(pl):	povray pod X Window
 Group:		Applications/Graphics
-Group(de):	Applikationen/Grafik
-Group(pl):	Aplikacje/Grafika
 Requires:	%{name} = %{version}
 
 %description X11
@@ -66,8 +62,6 @@ Plik wykonywalny The Persistence of Vision(tm) Ray-Tracer dla X Window.
 %package pvm
 Summary:	PVM/unix povray executable
 Group:		Applications/Graphics
-Group(de):	Applikationen/Grafik
-Group(pl):	Aplikacje/Grafika
 Requires:	%{name} = %{version}
 
 %description pvm
@@ -80,8 +74,6 @@ Plik wykonywalny The Persistence of Vision(tm) Ray-Tracer dla PVM/unix.
 %package pvm-X11
 Summary:	PVM/xwin povray executable
 Group:		Applications/Graphics
-Group(de):	Applikationen/Grafik
-Group(pl):	Aplikacje/Grafika
 Requires:	%{name} = %{version}
 
 %description pvm-X11

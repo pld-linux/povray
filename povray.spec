@@ -2,7 +2,7 @@ Summary:	Persistence of Vision Ray Tracer
 Summary(pl):	Persistence of Vision Ray Tracer
 Name:		povray
 Version:	3.1g
-Release:	1
+Release:	2
 Copyright:	distrituable
 Group:		Applications/Graphics
 Group(pl):	Aplikacje/Grafika
@@ -33,6 +33,12 @@ jest definiowana w w/w pliku tekstowym. Ray-tracing nie pozwala na szybkie
 tworzenie obrazów, ale za to twórca otrzymuje wyskokiej jako¶ci bitmapy z
 realistycznymi efektami, tj. odbicia ¶wiat³a, cienie, perspektywa i inne.
 
+%package X11
+Summary:	X-Windows povray executable
+Group:		Applications/Graphics
+Group(pl):	Aplikacje/Grafika
+Require:	%{name} = %{version}
+
 %prep
 %setup -q -n povray31 -b 1
 
@@ -40,7 +46,6 @@ realistycznymi efektami, tj. odbicia ¶wiat³a, cienie, perspektywa i inne.
 
 %build
 cd source/unix
-OPT_FLAGS="$RPM_OPT_FLAGS"
 make newunix newxwin OPT_FLAGS="$RPM_OPT_FLAGS"
 
 %install
@@ -50,20 +55,23 @@ install -d $RPM_BUILD_ROOT{%{_bindir},/etc/skel,%{_mandir}/man1,%{_datadir}/povr
 install -s source/unix/{povray,x-povray} $RPM_BUILD_ROOT%{_bindir}
 install source/unix/povrayrc $RPM_BUILD_ROOT/etc/skel/.povrayrc
 
-gzip -9nf gamma.gif.txt povray.1 povlegal.doc povuser.txt
+install povray.1 $RPM_BUILD_ROOT%{_mandir}/man1
 
-install povray.1.gz $RPM_BUILD_ROOT%{_mandir}/man1
-
-find . -type f -exec chmod 644 {} \;
 cp -r allscene include scenes $RPM_BUILD_ROOT%{_datadir}/povray31
 install *.ini *.pov $RPM_BUILD_ROOT%{_datadir}/povray31
+
+gzip -9nf gamma.gif.txt povlegal.doc povuser.txt \
+	%{_mandir}/man1/*
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %doc gamma.gif.txt.gz povuser.txt.gz gamma.gif povlegal.doc.gz
-%attr(755,root,root) %{_bindir}/x-povray
-%{_bindir}/povray
+%attr(755,root,root) %{_bindir}/povray
 %{_datadir}/povray31
 /etc/skel/.povrayrc
+%{_mandir}/man1/*
+
+%files
+%attr(755,root,root) %{_bindir}/x-povray

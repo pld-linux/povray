@@ -6,8 +6,8 @@ Release:	1
 Copyright:	distrituable
 Group:		Applications/Graphics
 Group(pl):	Aplikacje/Grafika
-Source0:	povuni_s.tgz
-Source1:	povuni_d.tgz
+Source0:	ftp://ftp.povray.org/pub/povray/Official/Unix/povuni_s.tgz
+Source1:	ftp://ftp.povray.org/pub/povray/Official/Unix/povuni_d.tgz
 Patch:		povray-makefile_and_config.patch
 URL:		http://www.povray.org/
 BuildRequires:	zlib-devel

@@ -55,7 +55,8 @@ Requires:	%{name} = %{version}
 The Persistence of Vision(tm) Ray-Tracer X Window executable.
 
 %description X11 -l pl
-Plik wykonywalny The Persistence of Vision(tm) Ray-Tracer dla X Window.
+Plik wykonywalny The Persistence of Vision(tm) Ray-Tracer dla X
+Window.
 %endif
 
 %if %{!?_without_pvm:1}%{?_without_pvm:0}
@@ -68,7 +69,8 @@ Requires:	%{name} = %{version}
 The Persistence of Vision(tm) Ray-Tracer PVM/unix executable.
 
 %description X11 -l pl
-Plik wykonywalny The Persistence of Vision(tm) Ray-Tracer dla PVM/unix.
+Plik wykonywalny The Persistence of Vision(tm) Ray-Tracer dla
+PVM/unix.
 
 %if %{!?_without_x:1}%{?_without_x:0}
 %package pvm-X11
@@ -80,7 +82,8 @@ Requires:	%{name} = %{version}
 The Persistence of Vision(tm) Ray-Tracer PVM/xwin executable.
 
 %description X11 -l pl
-Plik wykonywalny The Persistence of Vision(tm) Ray-Tracer dla PVM/xwin.
+Plik wykonywalny The Persistence of Vision(tm) Ray-Tracer dla
+PVM/xwin.
 %endif
 %endif
 

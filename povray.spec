@@ -23,7 +23,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 #ugly but now _pvm_root/_pvm_arch isnt defined in macros
 
-%define		_pvm_root 	%{_libdir}/pvm3
+%define		_pvm_root	%{_libdir}/pvm3
 %define		_pvm_arch	%(ls %{_pvm_root}/conf/|sed -e 's/\.def//')
 
 %description
@@ -57,6 +57,9 @@ Requires:	%{name} = %{version}
 
 %description X11
 The Persistence of Vision(tm) Ray-Tracer X Window executable.
+
+%description X11 -l pl
+Plik wykonywalny The Persistence of Vision(tm) Ray-Tracer dla X Window.
 %endif
 
 %if %{!?_without_pvm:1}%{?_without_pvm:0}
@@ -70,6 +73,9 @@ Requires:	%{name} = %{version}
 %description pvm
 The Persistence of Vision(tm) Ray-Tracer PVM/unix executable.
 
+%description X11 -l pl
+Plik wykonywalny The Persistence of Vision(tm) Ray-Tracer dla PVM/unix.
+
 %if %{!?_without_x:1}%{?_without_x:0}
 %package pvm-X11
 Summary:	PVM/xwin povray executable
@@ -80,11 +86,14 @@ Requires:	%{name} = %{version}
 
 %description pvm-X11
 The Persistence of Vision(tm) Ray-Tracer PVM/xwin executable.
+
+%description X11 -l pl
+Plik wykonywalny The Persistence of Vision(tm) Ray-Tracer dla PVM/xwin.
 %endif
 %endif
 
 %prep
-%setup -q -n povray31 -b 1 
+%setup -q -n povray31 -b 1
 %patch0 -p1
 %patch1 -p0
 %patch2 -p1

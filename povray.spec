@@ -6,11 +6,12 @@
 Summary:	Persistence of Vision Ray Tracer
 Summary(pl):	Persistence of Vision Ray Tracer
 Name:		povray
-Version:	3.50b
-Release:	2
+Version:	3.50c
+Release:	1
 License:	distributable
 Group:		Applications/Graphics
 Source0:	ftp://ftp.povray.org/pub/povray/Official/Unix/povuni_s.tgz
+Source1:	%{name}-%{version}.md5sum
 Patch0:		%{name}-legal.patch
 Patch1:		%{name}-types.patch
 # pvm support not yet available - http://pvmpov.sourceforge.net/
@@ -84,17 +85,27 @@ Plik wykonywalny The Persistence of Vision(tm) Ray-Tracer dla
 PVM/xwin.
 
 %prep
+cd %{_sourcedir}
+md5sum -c %{name}-%{version}.md5sum
+cd -
 %setup -q
 %patch0 -p1
+%ifarch alpha
 %patch1 -p1
+%endif
 
 %build
+%{__aclocal}
+%{__autoconf}
+%{__automake}
+%if %{!?_without_x:1}%{?_without_x:0}
 %configure \
 	--x-includes=%{_prefix}/X11R6/include \
 	--x-libraries=%{_prefix}/X11R6/lib
 %{__make}
 install src/povray x-povray
 %{__make} clean
+%endif
 
 %configure \
 	--without-x
@@ -107,9 +118,12 @@ install -d $RPM_BUILD_ROOT{%{_sysconfdir},%{_prefix}/X11R6/bin}
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
+%if %{!?_without_x:1}%{?_without_x:0}
 install x-povray $RPM_BUILD_ROOT%{_prefix}/X11R6/bin
+%endif
+
 install povray.ini $RPM_BUILD_ROOT%{_sysconfdir}
-ln -sf %{_sysconfdir}/povray.ini $RPM_BUILD_ROOT%{_datadir}/povray-*/povray.ini
+ln -sf %{_sysconfdir}/povray.ini $RPM_BUILD_ROOT%{_datadir}/povray-3.5/povray.ini
 
 %clean
 rm -rf $RPM_BUILD_ROOT

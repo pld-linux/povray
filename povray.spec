@@ -20,7 +20,7 @@ Group:		Applications/Graphics
 #Source0:	ftp://ftp.povray.org/pub/povray/Official/Unix/povuni_s.tgz
 # based on sources from CVS at http://pvmpov.sourceforge.net/
 Source0:	%{name}-%{version}-%{snap}.tar.gz
-# Source0-md5: 4dc3a74c6182e9f9cb2fc46187fe7e6b
+# Source0-md5:	4dc3a74c6182e9f9cb2fc46187fe7e6b
 Patch0:		%{name}-legal.patch
 Patch1:		%{name}-64bit.patch
 Patch2:		%{name}-X-libs.patch

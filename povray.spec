@@ -1,4 +1,4 @@
-# $Revision: 1.1 $
+# $Revision: 1.2 $
 Summary:       Persistence of Vision Ray Tracer
 Summary(pl):   Persistence of Vision Ray Tracer
 Name:          povray
@@ -9,7 +9,7 @@ Group:         Applications/Graphics
 Group(pl):     Aplikacje/Grafika
 Source0:       povuni_s.tgz
 Source1:       povuni_d.tgz
-Patch0:        povray31-makefile_and_config.patch
+Patch0:        povray-makefile_and_config.patch
 URL:           http://www.povray.org/
 BuildRequires: zlib-devel
 BuildRequires: libpng-devel

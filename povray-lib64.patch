@@ -1,0 +1,20 @@
+diff -dur povray-3.50c.orig/acinclude.m4 povray-3.50c/acinclude.m4
+--- povray-3.50c.orig/acinclude.m4	2002-12-30 20:33:38.000000000 +0100
++++ povray-3.50c/acinclude.m4	2004-01-07 14:21:23.602520944 +0100
+@@ -38,11 +38,11 @@
+                      /usr/gnu           \
+                      /opt/gnu           \
+                      /opt/local/pvm3    \
+-                     /usr/lib/pvm3      \
+-                     /usr/local/lib/pvm3\
++                     /usr/lib64/pvm3      \
++                     /usr/local/lib64/pvm3\
+                      /opt/local/pvm     \
+-                     /usr/lib/pvm       \
+-                     /usr/local/lib/pvm \
++                     /usr/lib64/pvm       \
++                     /usr/local/lib64/pvm \
+                      $prefix            \
+                     "
+   dnl ******************************************
+Only in povray-3.50c: acinclude.m4~

@@ -88,7 +88,10 @@ cd source/unix
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_bindir},/etc/skel,%{_mandir}/man1,%{_datadir}/povray31}
 
-install source/unix/%{?_without_x:povray}%{!?_without_x:{povray,x-povray}%{!?_without_pvm:,pvmpov%{!?_without_x:,x-pvmpov}}} $RPM_BUILD_ROOT%{_bindir}
+install source/unix/povray $RPM_BUILD_ROOT%{_bindir}
+%{!?_without_x:install source/unix/x-povray $RPM_BUILD_ROOT%{_bindir}}
+%{!?_without_pvm:install source/unix/pvmpov $RPM_BUILD_ROOT%{_bindir}}
+%{!?_without_pvm:%{!?_without_x:install source/unix/x-pvmpov $RPM_BUILD_ROOT%{_bindir}}}
 install source/unix/povrayrc $RPM_BUILD_ROOT/etc/skel/.povrayrc
 
 install povray.1 $RPM_BUILD_ROOT%{_mandir}/man1

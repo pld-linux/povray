@@ -3,7 +3,7 @@ Summary(pl):	Persistence of Vision Ray Tracer
 Name:		povray
 Version:	3.1g
 Release:	5
-Copyright:	distrituable
+License:	distrituable
 Group:		Applications/Graphics
 Group(de):	Applikationen/Grafik
 Group(pl):	Aplikacje/Grafika

@@ -1,4 +1,9 @@
+
 #
+# todo:
+#      patch for s#/usr/local#/usr# in povray.ini
+#
+
 # Conditional build:
 # _without_x	- without X11 subpackage
 # _without_pvm	- [temporarily disabled by default] without PVM support

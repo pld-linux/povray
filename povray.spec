@@ -5,6 +5,7 @@ Version:	3.1g
 Release:	4
 Copyright:	distrituable
 Group:		Applications/Graphics
+Group(de):	Applikationen/Grafik
 Group(pl):	Aplikacje/Grafika
 Source0:	ftp://ftp.povray.org/pub/povray/Official/Unix/povuni_s.tgz
 Source1:	ftp://ftp.povray.org/pub/povray/Official/Unix/povuni_d.tgz
@@ -37,7 +38,9 @@ efektami, tj. odbicia ¶wiat³a, cienie, perspektywa i inne.
 
 %package X11
 Summary:	X Window povray executable
+Summary(pl):	povray pod X Window
 Group:		Applications/Graphics
+Group(de):	Applikationen/Grafik
 Group(pl):	Aplikacje/Grafika
 Requires:	%{name} = %{version}
 
@@ -46,18 +49,17 @@ The Persistence of Vision(tm) Ray-Tracer X Window executable.
 
 %prep
 %setup -q -n povray31 -b 1
-
 %patch0 -p1
 
 %build
 cd source/unix
-%{__make} newunix newxwin OPT_FLAGS="$RPM_OPT_FLAGS"
+%{__make} newunix newxwin OPT_FLAGS="%{rpmcflags}"
 
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_bindir},/etc/skel,%{_mandir}/man1,%{_datadir}/povray31}
 
-install -s source/unix/{povray,x-povray} $RPM_BUILD_ROOT%{_bindir}
+install source/unix/{povray,x-povray} $RPM_BUILD_ROOT%{_bindir}
 install source/unix/povrayrc $RPM_BUILD_ROOT/etc/skel/.povrayrc
 
 install povray.1 $RPM_BUILD_ROOT%{_mandir}/man1
@@ -65,8 +67,7 @@ install povray.1 $RPM_BUILD_ROOT%{_mandir}/man1
 cp -r allscene include scenes $RPM_BUILD_ROOT%{_datadir}/povray31
 install *.ini *.pov $RPM_BUILD_ROOT%{_datadir}/povray31
 
-gzip -9nf gamma.gif.txt povlegal.doc povuser.txt \
-	$RPM_BUILD_ROOT%{_mandir}/man1/*
+gzip -9nf gamma.gif.txt povlegal.doc povuser.txt
 
 %clean
 rm -rf $RPM_BUILD_ROOT

@@ -1,6 +1,6 @@
 diff -Naur source.ori/optin.c source/optin.c
 --- source.ori/optin.c	Sat Jun 30 01:49:21 2001
-+++ source/optin.c	Sat Jun 30 10:01:28 2001
++++ source/optin.c	Sat Jun 30 13:55:01 2001
 @@ -30,7 +30,8 @@
  *
  *  Written by CEY 4/94 based on existing code and INI code from CDW.
@@ -22,12 +22,12 @@ diff -Naur source.ori/optin.c source/optin.c
  
  
  /*****************************************************************************
-@@ -187,7 +190,23 @@
- 
+@@ -188,6 +191,21 @@
    { BITS_PER_COLOR_OP, "Bits_Per_Color" },
    { BITS_PER_COLOUR_OP, "Bits_Per_Colour" },
+   { INCLUDE_INI_OP, "Include_Ini" }
 +#ifdef USE_PVM
-+ { INCLUDE_INI_OP, "Include_Ini" },
++ ,
 +
 + /* new options for PVM-Pov */
 + { PVM_TASKS_OP, "PVM_Tasks" },
@@ -40,13 +40,11 @@ diff -Naur source.ori/optin.c source/optin.c
 + { PVM_HOSTS_OP, "PVM_Hosts" },
 + { PVM_USE_OP, "PVM" }
 +
-+#else
-   { INCLUDE_INI_OP, "Include_Ini" }
 +#endif
  };
  
  static char temp_string[3]="\0\0";
-@@ -229,7 +248,8 @@
+@@ -229,7 +247,8 @@
  *
  * CHANGES
  *
@@ -56,7 +54,7 @@ diff -Naur source.ori/optin.c source/optin.c
  *
  ******************************************************************************/
  
-@@ -560,6 +580,44 @@
+@@ -560,6 +579,44 @@
      case INCLUDE_INI_OP:
        value[0] = '\0';
        return value;
@@ -101,7 +99,7 @@ diff -Naur source.ori/optin.c source/optin.c
  
      default:
        Error("Unknown INI option in Write_INI.");
-@@ -602,6 +660,8 @@
+@@ -602,6 +659,8 @@
  *   Sep 1994 : Added options for union splitting, vista/light buffer. [DB]
  *   Jan 1995 : Added options for histogram grid. [CJC]
  *   Feb 1995 : Added options for console/file redirection and .INI writing [SCD]
@@ -110,7 +108,7 @@ diff -Naur source.ori/optin.c source/optin.c
  *
  ******************************************************************************/
  
-@@ -1024,13 +1084,67 @@
+@@ -1024,13 +1083,67 @@
        break;
  
      /*  "N" option flag is used by networking (multi-processor) options.
@@ -184,7 +182,7 @@ diff -Naur source.ori/optin.c source/optin.c
  
      case 'O':
      case 'o':
-@@ -1262,7 +1376,8 @@
+@@ -1262,7 +1375,8 @@
  *
  * CHANGES
  *
@@ -194,7 +192,7 @@ diff -Naur source.ori/optin.c source/optin.c
  *
  ******************************************************************************/
  
-@@ -1445,21 +1560,36 @@
+@@ -1445,21 +1559,36 @@
        return;
  
      case END_COLUMN_OP:
@@ -231,7 +229,7 @@ diff -Naur source.ori/optin.c source/optin.c
          if(floatval > 0.0 && floatval <= 1.0)
          {
            opts.Last_Line = -1;
-@@ -1831,6 +1961,86 @@
+@@ -1831,6 +1960,86 @@
          Error ("Could not open Include_Ini='%s'.\n", value);
        }
        return;
@@ -354,7 +352,7 @@ diff -Naur source.ori/optin.h source/optin.h
  } INI_OP;
 diff -Naur source.ori/optout.c source/optout.c
 --- source.ori/optout.c	Sat Jun 30 01:49:21 2001
-+++ source/optout.c	Sat Jun 30 09:25:02 2001
++++ source/optout.c	Sat Jun 30 13:56:11 2001
 @@ -19,6 +19,9 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
@@ -400,7 +398,7 @@ diff -Naur source.ori/optout.c source/optout.c
  
        break;
  
-@@ -767,6 +779,40 @@
+@@ -767,6 +779,45 @@
  
        break;
  
@@ -423,6 +421,11 @@ diff -Naur source.ori/optout.c source/optout.c
 +      Banner("  pvm_hosts = n,n,..  = List of hostnames to use\n");
 +      Banner("\n");
 +
++      break;
++
++    case 8:
++
++      
 +    /* Redirecting options. */
 +
 +      Banner("\n");
@@ -441,7 +444,7 @@ diff -Naur source.ori/optout.c source/optout.c
      /* Redirecting options. */
  
      case 7:
-@@ -782,6 +828,7 @@
+@@ -782,6 +833,7 @@
        Banner("            GR - Render stream\n");
        Banner("            GS - Statistics stream\n");
        Banner("            GW - Warning stream\n");
@@ -449,7 +452,7 @@ diff -Naur source.ori/optout.c source/optout.c
  
        break;
  
-@@ -867,7 +914,8 @@
+@@ -867,7 +919,8 @@
  *
  * CHANGES
  *
@@ -459,7 +462,7 @@ diff -Naur source.ori/optout.c source/optout.c
  *
  ******************************************************************************/
  
-@@ -1089,6 +1137,26 @@
+@@ -1089,6 +1142,26 @@
    }
  
    Render_Info("\n");
@@ -523,7 +526,7 @@ diff -Naur source.ori/optout.h source/optout.h
  
 diff -Naur source.ori/povray.c source/povray.c
 --- source.ori/povray.c	Sat Jun 30 01:49:21 2001
-+++ source/povray.c	Sat Jun 30 09:55:32 2001
++++ source/povray.c	Sat Jun 30 19:29:39 2001
 @@ -20,6 +20,10 @@
  * DKBTrace was originally written by David K. Buck.
  * DKBTrace Ver 2.0-2.12 were written by David K. Buck & Aaron A. Collins.
@@ -658,11 +661,12 @@ diff -Naur source.ori/povray.c source/povray.c
    /* Execute the first shell-out command */
    Pre_Scene_Result=(POV_SHELLOUT_CAST)POV_SHELLOUT(PRE_SCENE_SHL);
  
-@@ -314,6 +376,26 @@
+@@ -313,6 +375,54 @@
+   
    if (Pre_Scene_Result != ALL_SKIP_RET)
    {
-      if (Pre_Scene_Result != SKIP_ONCE_RET)
 +#ifdef USE_PVM
++     if (Pre_Scene_Result != SKIP_ONCE_RET)
 +       if(!PvmSlave && PvmTasks) {
 +           START_TIME
 +           Pvm_Master_Control();     /* distribute work,
@@ -681,27 +685,58 @@ diff -Naur source.ori/povray.c source/povray.c
 +              opts.FrameSeq.FrameNumber++,
 +              opts.FrameSeq.Clock_Value += Clock_Delta)
 +       {
++           setup_output_file_name();
++
++           /* Execute a shell-out command before tracing */
++
++           Frame_Result=(POV_SHELLOUT_CAST)POV_SHELLOUT(PRE_FRAME_SHL);
++          
++           if (Frame_Result == ALL_SKIP_RET)
++           {
++             break;
++           }
++
++           if (Frame_Result != SKIP_ONCE_RET)
++           {
++             FrameRender();
++
++             /* Execute a shell-out command after tracing */
++
++             Frame_Result = (POV_SHELLOUT_CAST)POV_SHELLOUT(POST_FRAME_SHL);
++          
++             if ((Frame_Result==SKIP_ONCE_RET) || (Frame_Result==ALL_SKIP_RET))
++             {
++               break;
++             }
++           }
++         }
++       }
++
 +#else
+      if (Pre_Scene_Result != SKIP_ONCE_RET)
       {
         for (opts.FrameSeq.FrameNumber = opts.FrameSeq.InitialFrame,
-             opts.FrameSeq.Clock_Value = opts.FrameSeq.InitialClock;
-@@ -323,6 +405,7 @@
-             opts.FrameSeq.FrameNumber++,
-             opts.FrameSeq.Clock_Value += Clock_Delta)
-        {
-+#endif
-          setup_output_file_name();
- 
-          /* Execute a shell-out command before tracing */
-@@ -348,7 +431,6 @@
-            }
+@@ -349,8 +459,10 @@
           }
         }
--
+ 
++
++#endif
         /* Print total stats ... */
-  
+- 
++
         if(opts.FrameSeq.FrameType==FT_MULTIPLE_FRAME)
-@@ -399,6 +481,8 @@
+        {
+          Statistics("\nTotal Statistics");
+@@ -371,7 +483,6 @@
+   /* And finish. */
+ 
+   Terminate_POV(0);
+-
+   MAIN_RETURN_STATEMENT
+ } /* main */
+ 
+@@ -399,6 +510,8 @@
  * CHANGES
  *
  *   Feb 1996: Make sure we are displaying when doing a mosaic preview [AED]
@@ -710,7 +745,7 @@ diff -Naur source.ori/povray.c source/povray.c
  *
  ******************************************************************************/
  
-@@ -483,6 +567,30 @@
+@@ -483,6 +596,30 @@
    /* Save variable values. */
    variable_store(STORE);
  
@@ -741,7 +776,7 @@ diff -Naur source.ori/povray.c source/povray.c
    /* Open output file and if we are continuing an interrupted trace,
     * read in the previous file settings and any data there.  This has to
     * be done before any image-size related allocations, since the settings
-@@ -502,15 +610,45 @@
+@@ -502,15 +639,45 @@
      /* Display vista tree. */
      Draw_Vista_Buffer();
    }
@@ -788,7 +823,7 @@ diff -Naur source.ori/povray.c source/povray.c
    if ((opts.Options & DISKWRITE) && (opts.Options & CONTINUE_TRACE))
    {
      Read_Rendered_Part(Actual_Output_Name);
-@@ -529,7 +667,7 @@
+@@ -529,7 +696,7 @@
  
    /* Get total parsing time. */
    tparse_total += tparse;
@@ -797,13 +832,13 @@ diff -Naur source.ori/povray.c source/povray.c
    /* Store start time for trace. */
    START_TIME
  
-@@ -547,7 +685,65 @@
+@@ -547,7 +714,65 @@
    POV_PRE_RENDER
  
    Status_Info ("\nRendering...\r");
 +#ifdef USE_PVM
 +  do {
- 
++
 +    /* Macro for setting up any special FP options */
 +    CONFIG_MATH
 +
@@ -838,7 +873,7 @@ diff -Naur source.ori/povray.c source/povray.c
 +        Start_Adaptive_Tracing();
 +
 +        break;
-+
+ 
 +      case 1 :
 +      default:
 +
@@ -863,7 +898,7 @@ diff -Naur source.ori/povray.c source/povray.c
    /* Macro for setting up any special FP options */
    CONFIG_MATH
  
-@@ -600,7 +796,7 @@
+@@ -600,7 +825,7 @@
    {
       Close_File(Output_File_Handle);
    }
@@ -872,7 +907,7 @@ diff -Naur source.ori/povray.c source/povray.c
    Stage = STAGE_SHUTDOWN;
  
    POV_PRE_SHUTDOWN
-@@ -626,6 +822,27 @@
+@@ -626,6 +851,27 @@
    /* Get total render time. */
    trender_total += trender;
  
@@ -900,7 +935,7 @@ diff -Naur source.ori/povray.c source/povray.c
    POV_DISPLAY_FINISHED
  
    if ((opts.Options & DISPLAY) && Display_Started)
-@@ -642,7 +859,7 @@
+@@ -642,7 +888,7 @@
  
    /* Print stats ... */
    PRINT_STATS(stats);
@@ -909,7 +944,7 @@ diff -Naur source.ori/povray.c source/povray.c
    if(opts.FrameSeq.FrameType==FT_MULTIPLE_FRAME)
    {
      /* Add them up */
-@@ -1030,8 +1247,11 @@
+@@ -1030,8 +1276,11 @@
  *          NULL function pointer.
  *
  ******************************************************************************/
@@ -922,7 +957,7 @@ diff -Naur source.ori/povray.c source/povray.c
  {
    char *def_ext = NULL;
    char temp[FILE_NAME_LENGTH];
-@@ -1110,7 +1330,11 @@
+@@ -1110,7 +1359,11 @@
  *                  function appends a path separator on output.
  *
  ******************************************************************************/
@@ -934,7 +969,7 @@ diff -Naur source.ori/povray.c source/povray.c
  {
    char number_string[10];
    char separator_string[2] = {FILENAME_SEPARATOR, 0} ;
-@@ -1219,8 +1443,11 @@
+@@ -1219,8 +1472,11 @@
  *   -
  *
  ******************************************************************************/
@@ -947,7 +982,7 @@ diff -Naur source.ori/povray.c source/povray.c
  {
    int Buffer_Size;
    
-@@ -1378,12 +1605,18 @@
+@@ -1378,12 +1634,18 @@
    opts.Radiosity_Nearest_Count = 6;
    opts.Radiosity_Recursion_Limit = 1;
    opts.Radiosity_Quality = 6;     /* Q-flag value for light gathering */

@@ -20,10 +20,10 @@ BuildRequires:	libpng-devel >= 1.0.8
 %{!?_without_pvm:BuildRequires:pvm-devel}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-#ugly but now _pvm_root isnt defined in macros
+#ugly but now _pvm_root/_pvm_arch isnt defined in macros
 
 %define		_pvm_root 	%{_datadir}/pvm3
-%define		_pvm_arch	LINUX
+%define		_pvm_arch	%(ls /usr/share/pvm3/conf/|sed -e 's/\.def//')
 
 %description
 The Persistence of Vision(tm) Ray-Tracer creates three-dimensional,
@@ -56,7 +56,6 @@ efektami, tj. odbicia ¶wiat³a, cienie, perspektywa i inne.
 %{!?_without_x:%description X11}
 %{!?_without_x:The Persistence of Vision(tm) Ray-Tracer X Window executable.}
 
-
 %{!?_without_pvm:%package pvm}
 %{!?_without_pvm:Summary:	PVM/unix povray executable}
 %{!?_without_pvm:Group:		Applications/Graphics}
@@ -67,7 +66,6 @@ efektami, tj. odbicia ¶wiat³a, cienie, perspektywa i inne.
 %{!?_without_pvm:%description pvm}
 %{!?_without_pvm:The Persistence of Vision(tm) Ray-Tracer PVM/unix executable.}
 
-
 %{!?_without_pvm:%{!?_without_x:%package pvm-X11}}
 %{!?_without_pvm:%{!?_without_x:Summary:	PVM/xwin povray executable}}
 %{!?_without_pvm:%{!?_without_x:Group:		Applications/Graphics}}
@@ -77,8 +75,6 @@ efektami, tj. odbicia ¶wiat³a, cienie, perspektywa i inne.
 
 %{!?_without_pvm:%{!?_without_x:%description pvm-X11}}
 %{!?_without_pvm:%{!?_without_x:The Persistence of Vision(tm) Ray-Tracer PVM/xwin executable.}}
-
-
 
 %prep
 %setup -q -n povray31 -b 1 

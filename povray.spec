@@ -32,6 +32,7 @@ BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	libjpeg-devel
 BuildRequires:	libpng-devel >= 1.0.8
+BuildRequires:	pvm
 BuildRequires:	libstdc++-devel
 BuildRequires:	libtiff-devel
 %{?with_pvm:BuildRequires:	pvm-devel >= 3.4.3-24}

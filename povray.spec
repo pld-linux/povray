@@ -76,5 +76,5 @@ rm -rf $RPM_BUILD_ROOT
 /etc/skel/.povrayrc
 %{_mandir}/man1/*
 
-%files
+%files X11
 %attr(755,root,root) %{_bindir}/x-povray

@@ -1,19 +1,18 @@
-# $Revision: 1.3 $
-Summary:       Persistence of Vision Ray Tracer
-Summary(pl):   Persistence of Vision Ray Tracer
-Name:          povray
-Version:       3.1g
-Release:       1
-Copyright:     distrituable
-Group:         Applications/Graphics
-Group(pl):     Aplikacje/Grafika
-Source0:       povuni_s.tgz
-Source1:       povuni_d.tgz
-Patch0:        povray-makefile_and_config.patch
-URL:           http://www.povray.org/
-BuildRequires: zlib-devel
-BuildRequires: libpng-devel
-BuildRoot:    /tmp/%{name}-%{version}-root
+Summary:	Persistence of Vision Ray Tracer
+Summary(pl):	Persistence of Vision Ray Tracer
+Name:		povray
+Version:	3.1g
+Release:	1
+Copyright:	distrituable
+Group:		Applications/Graphics
+Group(pl):	Aplikacje/Grafika
+Source0:	povuni_s.tgz
+Source1:	povuni_d.tgz
+Patch:		povray-makefile_and_config.patch
+URL:		http://www.povray.org/
+BuildRequires:	zlib-devel
+BuildRequires:	libpng-devel
+BuildRoot:	/tmp/%{name}-%{version}-root
 
 %description
 From the user manual:
@@ -60,8 +59,7 @@ install -s -m 755 povray x-povray $RPM_BUILD_ROOT%{_bindir}
 install -m 644 povrayrc $RPM_BUILD_ROOT/etc/skel/.povrayrc
 popd
 
-gzip -9nf gamma.gif.txt povray.1 povlegal.doc
-bzip2 povuser.txt
+gzip -9nf gamma.gif.txt povray.1 povlegal.doc povuser.txt
 
 install -d $RPM_BUILD_ROOT%{_mandir}/man1
 install -m 644 povray.1.gz $RPM_BUILD_ROOT%{_mandir}/man1
@@ -76,7 +74,7 @@ install -m 644 *.pov $RPM_BUILD_ROOT%{_datadir}/povray31
 rm -rf $RPM_BUILD_ROOT
 
 %files
-%doc gamma.gif.txt.gz povuser.txt.bz2 gamma.gif povlegal.doc.gz
+%doc gamma.gif.txt.gz povuser.txt.gz gamma.gif povlegal.doc.gz
 %{_bindir}/x-povray
 %{_bindir}/povray
 %{_datadir}/povray31

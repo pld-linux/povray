@@ -20,6 +20,11 @@ BuildRequires:	libpng-devel >= 1.0.8
 %{!?_without_pvm:BuildRequires:pvm-devel}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
+#ugly but now _pvm_root isnt defined in macros
+
+%define		_pvm_root 	%{_datadir}/pvm3
+%define		_pvm_arch	LINUX
+
 %description
 The Persistence of Vision(tm) Ray-Tracer creates three-dimensional,
 photo-realistic images using a rendering technique called ray-tracing.
@@ -86,12 +91,13 @@ cd source/unix
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_bindir},/etc/skel,%{_mandir}/man1,%{_datadir}/povray31}
+install -d $RPM_BUILD_ROOT{%{_bindir},/etc/skel,%{_mandir}/man1,%{_datadir}/povray31,%{_pvm_root}/bin/%{_pvm_arch}}
+
 
 install source/unix/povray $RPM_BUILD_ROOT%{_bindir}
 %{!?_without_x:install source/unix/x-povray $RPM_BUILD_ROOT%{_bindir}}
-%{!?_without_pvm:install source/unix/pvmpov $RPM_BUILD_ROOT%{_bindir}}
-%{!?_without_pvm:%{!?_without_x:install source/unix/x-pvmpov $RPM_BUILD_ROOT%{_bindir}}}
+%{!?_without_pvm:install source/unix/pvmpov $RPM_BUILD_ROOT%{_pvm_root}/bin/%{_pvm_arch}}
+%{!?_without_pvm:%{!?_without_x:install source/unix/x-pvmpov $RPM_BUILD_ROOT%{_pvm_root}/bin/%{_pvm_arch}}}
 install source/unix/povrayrc $RPM_BUILD_ROOT/etc/skel/.povrayrc
 
 install povray.1 $RPM_BUILD_ROOT%{_mandir}/man1
@@ -118,8 +124,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %{!?_without_pvm:%files pvm}
 %{!?_without_pvm:%defattr(644,root,root,755)}
-%{!?_without_pvm:%attr(755,root,root) %{_bindir}/pvmpov}
+%{!?_without_pvm:%attr(755,root,root) %{_pvm_root}/bin/%{_pvm_arch}/pvmpov}
 
 %{!?_without_pvm:%{!?_without_x:%files pvm-X11}}
 %{!?_without_pvm:%{!?_without_x:%defattr(644,root,root,755)}}
-%{!?_without_pvm:%{!?_without_x:%attr(755,root,root) %{_bindir}/x-pvmpov}}
+%{!?_without_pvm:%{!?_without_x:%attr(755,root,root) %{_pvm_root}/bin/%{_pvm_arch}/x-pvmpov}}

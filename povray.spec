@@ -97,12 +97,14 @@ install src/povray x-povray
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT%{_prefix}/X11R6/bin
+install -d $RPM_BUILD_ROOT{%{_sysconfdir},%{_prefix}/X11R6/bin}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
 install x-povray $RPM_BUILD_ROOT%{_prefix}/X11R6/bin
+install povray.ini $RPM_BUILD_ROOT%{_sysconfdir}
+ln -sf %{_sysconfdir}/povray.ini $RPM_BUILD_ROOT%{_datadir}/povray-*/povray.ini
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -113,6 +115,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/povray
 %{_libdir}/povray*
 %{_mandir}/man?/*
+%config(noreplace) %verify(not md5 size mtime) %{_sysconfdir}/povray.ini
 
 %if %{!?_without_x:1}%{?_without_x:0}
 %files X11

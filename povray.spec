@@ -1,4 +1,4 @@
-# $Revision: 1.2 $
+# $Revision: 1.3 $
 Summary:       Persistence of Vision Ray Tracer
 Summary(pl):   Persistence of Vision Ray Tracer
 Name:          povray
@@ -14,11 +14,6 @@ URL:           http://www.povray.org/
 BuildRequires: zlib-devel
 BuildRequires: libpng-devel
 BuildRoot:    /tmp/%{name}-%{version}-root
-
-%define		_prefix		/usr/X11R6
-%define		_infodir	/usr/share/info
-%define		_mandir		/usr/X11R6/man
-%define		_sysconfdir	/etc/X11
 
 %description
 From the user manual:
@@ -59,30 +54,30 @@ popd
 
 %install
 pushd source/unix
-install -d $RPM_BUILD_ROOT/usr/bin
+install -d $RPM_BUILD_ROOT%{_bindir}
 install -d $RPM_BUILD_ROOT/etc/skel
-install -s -m 755 povray x-povray $RPM_BUILD_ROOT/usr/bin
+install -s -m 755 povray x-povray $RPM_BUILD_ROOT%{_bindir}
 install -m 644 povrayrc $RPM_BUILD_ROOT/etc/skel/.povrayrc
 popd
 
 gzip -9nf gamma.gif.txt povray.1 povlegal.doc
 bzip2 povuser.txt
 
-install -d $RPM_BUILD_ROOT/usr/share/man/man1
-install -m 644 povray.1.gz $RPM_BUILD_ROOT/usr/share/man/man1
+install -d $RPM_BUILD_ROOT%{_mandir}/man1
+install -m 644 povray.1.gz $RPM_BUILD_ROOT%{_mandir}/man1
 
-install -d $RPM_BUILD_ROOT/usr/share/povray31
+install -d $RPM_BUILD_ROOT%{_datadir}/povray31
 find . -type f -exec chmod 644 {} \;
-cp -r allscene include scenes $RPM_BUILD_ROOT/usr/share/povray31
-install -m 644 *.ini $RPM_BUILD_ROOT/usr/share/povray31
-install -m 644 *.pov $RPM_BUILD_ROOT/usr/share/povray31
+cp -r allscene include scenes $RPM_BUILD_ROOT%{_datadir}/povray31
+install -m 644 *.ini $RPM_BUILD_ROOT%{_datadir}/povray31
+install -m 644 *.pov $RPM_BUILD_ROOT%{_datadir}/povray31
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %doc gamma.gif.txt.gz povuser.txt.bz2 gamma.gif povlegal.doc.gz
-/usr/bin/x-povray
-/usr/bin/povray
-/usr/share/povray31
+%{_bindir}/x-povray
+%{_bindir}/povray
+%{_datadir}/povray31
 /etc/skel/.povrayrc

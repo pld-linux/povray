@@ -13,7 +13,7 @@ URL:		http://www.povray.org/
 BuildRequires:	zlib-devel
 BuildRequires:	libpng-devel
 BuildRequires:	XFree86-devel
-BuildRoot:	/tmp/%{name}-%{version}-root
+BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
 The Persistence of Vision(tm) Ray-Tracer creates three-dimensional,

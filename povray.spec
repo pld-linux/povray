@@ -1,14 +1,18 @@
-# _without_x
-# _without_pvm
+#
+# Conditional build:
+# _without_x	- without X11 subpackage
+# _without_pvm	- [temporarily disabled by default] without PVM support
+#
 Summary:	Persistence of Vision Ray Tracer
 Summary(pl):	Persistence of Vision Ray Tracer
 Name:		povray
 Version:	3.50b
-Release:	1
+Release:	2
 License:	distributable
 Group:		Applications/Graphics
 Source0:	ftp://ftp.povray.org/pub/povray/Official/Unix/povuni_s.tgz
 Patch0:		%{name}-legal.patch
+Patch1:		%{name}-types.patch
 # pvm support not yet available - http://pvmpov.sourceforge.net/
 URL:		http://www.povray.org/
 BuildRequires:	libjpeg-devel
@@ -82,6 +86,7 @@ PVM/xwin.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 %build
 %configure \

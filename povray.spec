@@ -34,10 +34,13 @@ tworzenie obrazów, ale za to twórca otrzymuje wyskokiej jako¶ci bitmapy z
 realistycznymi efektami, tj. odbicia ¶wiat³a, cienie, perspektywa i inne.
 
 %package X11
-Summary:	X-Windows povray executable
+Summary:	X Window povray executable
 Group:		Applications/Graphics
 Group(pl):	Aplikacje/Grafika
-Require:	%{name} = %{version}
+Requires:	%{name} = %{version}
+
+%description X11
+The Persistence of Vision(tm) Ray-Tracer X Window executable.
 
 %prep
 %setup -q -n povray31 -b 1

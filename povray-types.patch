@@ -1,0 +1,44 @@
+--- povray-3.50b/src/frame.h.orig	Wed Aug  7 15:17:13 2002
++++ povray-3.50b/src/frame.h	Tue Oct 29 11:57:54 2002
+@@ -37,6 +37,7 @@
+ /* Generic header for all modules */
+ 
+ #include <math.h>
++#include <stdint.h>
+ #include <stdio.h>
+ #include <string.h>
+ #include <limits.h>
+@@ -44,14 +45,14 @@
+ class pov_istream_class;
+ class pov_ostream_class;
+ 
+-typedef unsigned long u_int32 ;
+-typedef unsigned short u_int16 ;
+-typedef unsigned char u_int8 ;
+-typedef unsigned char byte ;
+-
+-typedef signed long int32 ;
+-typedef signed short int16 ;
+-typedef signed char int8 ;
++typedef uint32_t u_int32 ;
++typedef uint16_t u_int16 ;
++typedef uint8_t u_int8 ;
++typedef uint8_t byte ;
++
++typedef int32_t int32 ;
++typedef int16_t int16 ;
++typedef int8_t int8 ;
+ 
+ #include "config.h"
+ 
+--- povray-3.50b/src/optin.cpp.orig	Wed Aug  7 15:17:13 2002
++++ povray-3.50b/src/optin.cpp	Tue Oct 29 12:05:51 2002
+@@ -364,7 +364,7 @@
+ 
+ static bool matches(char *v1, char *v2);
+ 
+-POV_ISTREAM *Opts_Locate_File(char *filename, unsigned long stype, char *buffer, int err_flag, POVMSObjectPtr obj);
++POV_ISTREAM *Opts_Locate_File(char *filename, u_int32 stype, char *buffer, int err_flag, POVMSObjectPtr obj);
+ 
+ 
+ /*****************************************************************************

@@ -24,7 +24,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 #ugly but now _pvm_root/_pvm_arch isnt defined in macros
 
 %define		_pvm_root 	%{_libdir}/pvm3
-%define		_pvm_arch	%(ls %{pvm_root}/conf/|sed -e 's/\.def//')
+%define		_pvm_arch	%(ls %{_pvm_root}/conf/|sed -e 's/\.def//')
 
 %description
 The Persistence of Vision(tm) Ray-Tracer creates three-dimensional,

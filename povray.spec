@@ -2,13 +2,13 @@ Summary:	Persistence of Vision Ray Tracer
 Summary(pl):	Persistence of Vision Ray Tracer
 Name:		povray
 Version:	3.1g
-Release: 4
+Release:	4
 Copyright:	distrituable
 Group:		Applications/Graphics
 Group(pl):	Aplikacje/Grafika
 Source0:	ftp://ftp.povray.org/pub/povray/Official/Unix/povuni_s.tgz
 Source1:	ftp://ftp.povray.org/pub/povray/Official/Unix/povuni_d.tgz
-Patch0:		povray-makefile_and_config.patch
+Patch0:		%{name}-makefile_and_config.patch
 URL:		http://www.povray.org/
 BuildRequires:	zlib-devel
 BuildRequires:	libpng >= 1.0.8

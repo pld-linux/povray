@@ -6,7 +6,7 @@ diff -Nur povray31.orig/source/unix/makefile povray31/source/unix/makefile
  
  # Linux compiler flags, Pentium II optimized
 -CFLAGS      = -O6 -finline-functions -ffast-math -c -ansi -m386 -DCPU=686 -DCOMPILER_VER=\".`uname`.$(CC)\" -DPOV_LIB_DIR=\"$(POVLIBDIR)\" $(SRCINC) $(LIBPNGINC) $(ZLIBINC)
-+CFLAGS      = $(RPM_OPT_FLAGS) -finline-functions -ffast-math -c -ansi -DCOMPILER_VER=\".`uname`.$(CC)\" -DPOV_LIB_DIR=\"$(POVLIBDIR)\" $(SRCINC) $(LIBPNGINC) $(ZLIBINC)
++CFLAGS      = $(OPT_FLAGS) -finline-functions -ffast-math -c -ansi -DCOMPILER_VER=\".`uname`.$(CC)\" -DPOV_LIB_DIR=\"$(POVLIBDIR)\" $(SRCINC)
  
  # HPUX compiler flags
  #CFLAGS      = +O2 -finline-functions -c -Aa -D_HPUX_SOURCE -DCOMPILER_VER=\".`uname`.$(CC)\" $(SRCINC) $(LIBPNGINC) $(ZLIBINC)

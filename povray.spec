@@ -11,7 +11,7 @@ Source0:	ftp://ftp.povray.org/pub/povray/Official/Unix/povuni_s.tgz
 Source1:	ftp://ftp.povray.org/pub/povray/Official/Unix/povuni_d.tgz
 Source2:	pvmpov-3.1e2.tgz
 Patch0:		%{name}-makefile_and_config.patch
-Patch1:		patchek
+Patch1:		%{name}-pvm.patch
 URL:		http://www.povray.org/
 BuildRequires:	zlib-devel
 BuildRequires:	libpng >= 1.0.8
@@ -63,18 +63,11 @@ The Persistence of Vision(tm) Ray-Tracer PVM/newunix executable.
 %prep
 %setup -q -n povray31 -b 1 
 %patch0 -p1
-%patch1 -p1
+%patch1 -p0
 
 %build
 cd source/unix
-%{__make} newunix newxwin OPT_FLAGS="%{rpmcflags}"
-tar zxf %{SOURCE2}
-patch -p1 < pvmpov3_1e_2/pvmpov.patch
-install pvmpov3_1e_2/povray31/source/pvm/pvm.* source/
-install source/unix/povray source/unix/povray.ori
-%{__make} newunix OPT_FLAGS="%{rpmcflags}"
-install source/unix/povray source/unix/pvmpov
-install source/unix/povray.ori source/unix/povray
+%{__make} newunix newxwin newunix_pvm newxwin_pvm OPT_FLAGS="%{rpmcflags}"
 
 %install
 rm -rf $RPM_BUILD_ROOT

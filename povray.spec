@@ -15,7 +15,7 @@ Patch0:		%{name}-makefile_and_config.patch
 Patch1:		%{name}-pvm.patch
 URL:		http://www.povray.org/
 BuildRequires:	zlib-devel
-BuildRequires:	libpng >= 1.0.8
+BuildRequires:	libpng-devel >= 1.0.8
 %{!?_without_x:BuildRequires:XFree86-devel}
 %{!?_without_pvm:BuildRequires:pvm-devel}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)

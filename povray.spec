@@ -9,11 +9,13 @@ Group(de):	Applikationen/Grafik
 Group(pl):	Aplikacje/Grafika
 Source0:	ftp://ftp.povray.org/pub/povray/Official/Unix/povuni_s.tgz
 Source1:	ftp://ftp.povray.org/pub/povray/Official/Unix/povuni_d.tgz
+Source2:	pvmpov-3.1e2.tgz
 Patch0:		%{name}-makefile_and_config.patch
+Patch1:		patchek
 URL:		http://www.povray.org/
 BuildRequires:	zlib-devel
 BuildRequires:	libpng >= 1.0.8
-BuildRequires:	XFree86-devel
+%{!?_with_pvm:BuildRequires:XFree86-devel}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -47,19 +49,38 @@ Requires:	%{name} = %{version}
 %description X11
 The Persistence of Vision(tm) Ray-Tracer X Window executable.
 
+
+%package pvm
+Summary:	PVM/newunix povray executable
+Group:		Applications/Graphics
+Group(de):	Applikationen/Grafik
+Group(pl):	Aplikacje/Grafika
+Requires:	%{name} = %{version}
+
+%description pvm
+The Persistence of Vision(tm) Ray-Tracer PVM/newunix executable.
+
 %prep
-%setup -q -n povray31 -b 1
+%setup -q -n povray31 -b 1 
 %patch0 -p1
+%patch1 -p1
 
 %build
 cd source/unix
 %{__make} newunix newxwin OPT_FLAGS="%{rpmcflags}"
+tar zxf %{SOURCE2}
+patch -p1 < pvmpov3_1e_2/pvmpov.patch
+install pvmpov3_1e_2/povray31/source/pvm/pvm.* source/
+install source/unix/povray source/unix/povray.ori
+%{__make} newunix OPT_FLAGS="%{rpmcflags}"
+install source/unix/povray source/unix/pvmpov
+install source/unix/povray.ori source/unix/povray
 
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_bindir},/etc/skel,%{_mandir}/man1,%{_datadir}/povray31}
 
-install source/unix/{povray,x-povray} $RPM_BUILD_ROOT%{_bindir}
+install source/unix/{povray,x-povray,pvmpov} $RPM_BUILD_ROOT%{_bindir}
 install source/unix/povrayrc $RPM_BUILD_ROOT/etc/skel/.povrayrc
 
 install povray.1 $RPM_BUILD_ROOT%{_mandir}/man1
@@ -83,3 +104,7 @@ rm -rf $RPM_BUILD_ROOT
 %files X11
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/x-povray
+
+%files pvm
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/pvmpov

@@ -4,11 +4,11 @@
 #      patch for s#/usr/local#/usr# in povray.ini
 #      (no)svga version
 #
-
+#
 # Conditional build:
 %bcond_without x	# - without X11 subpackage
 %bcond_without pvm	# - without PVM support
-
+#
 %define		snap 20030110
 Summary:	Persistence of Vision Ray Tracer
 Summary(pl):	Persistence of Vision Ray Tracer
@@ -195,7 +195,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/x-povray
 %endif
 
-%if %{with pvm} && %{with pvm}
+%if %{with pvm}
 %files pvm
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_pvmroot}/bin/%{_pvmarch}/pvmpov

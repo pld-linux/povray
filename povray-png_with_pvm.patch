@@ -1,0 +1,1051 @@
+diff -ru povray31/source/frame.h povray31.fixed/source/frame.h
+--- povray31/source/frame.h	Sat May  1 15:01:17 1999
++++ povray31.fixed/source/frame.h	Fri Nov  9 00:19:38 2001
+@@ -1453,6 +1453,7 @@
+     COLOUR *line_data, int *line_number);
+   void (*Read_Image_p) (IMAGE *Image, char *filename);
+   void (*Close_File_p) (struct file_handle_struct *handle);
++  void *private;
+ };
+ 
+ #define Open_File(h,n,wd,ht,sz,m) ((*((h)->Open_File_p)) (h,n,wd,ht,sz,m))
+diff -ru povray31/source/png_pov.c povray31.fixed/source/png_pov.c
+--- povray31/source/png_pov.c	Sat May  1 15:01:24 1999
++++ povray31.fixed/source/png_pov.c	Fri Nov  9 09:04:21 2001
+@@ -71,8 +71,8 @@
+ #define FLUSH_DIST (*width >= 640 ? 10 : 6400 / *width)
+ */
+ #define FLUSH_DIST ((opts.Options & BUFFERED_OUTPUT && \
+-                     handle->buffer_size > (*width * png_stride * 5)) ? \
+-                    (handle->buffer_size / (*width * png_stride)): \
++                     handle->buffer_size > (*width * povpng_info->png_stride * 5)) ? \
++                    (handle->buffer_size / (*width * povpng_info->png_stride)): \
+                     (*width >= 640 ? 10 : 6400 / *width))
+ 
+ #define NTEXT 15     /* Maximum number of tEXt comment blocks */
+@@ -83,23 +83,22 @@
+ /*****************************************************************************
+ * Local typedefs
+ ******************************************************************************/
++typedef struct povpng_info_struct POVPNG_INFO;
+ 
+-
++struct povpng_info_struct {
++	png_structp png_ptr;
++	png_infop   info_ptr;
++	png_structp o_png_ptr;
++	png_bytep   row_ptr;
++	int         png_stride;
++	char        tmp_fname[FILE_NAME_LENGTH];
++	FILE       *tmp_fp;
++};
+ 
+ /*****************************************************************************
+ * Local variables
+ ******************************************************************************/
+ 
+-static png_struct *png_ptr  = NULL;
+-static png_info   *info_ptr = NULL;
+-static png_struct *o_png_ptr  = NULL;
+-static png_byte   *row_ptr  = NULL;
+-static int        png_stride;
+-static char       tmp_fname[FILE_NAME_LENGTH];
+-static FILE       *tmp_fp = NULL;
+-
+-
+-
+ /*****************************************************************************
+ * Static functions
+ ******************************************************************************/
+@@ -155,6 +154,7 @@
+ FILE_HANDLE *Get_Png_File_Handle()
+ {
+   FILE_HANDLE *handle;
++  POVPNG_INFO *povpng_info;
+   
+   handle = (FILE_HANDLE *)POV_MALLOC(sizeof(FILE_HANDLE), "PNG file handle");
+ 
+@@ -169,6 +169,16 @@
+   handle->file = NULL;
+   handle->buffer = NULL;
+   
++  povpng_info = (POVPNG_INFO *)POV_MALLOC(sizeof(POVPNG_INFO), "PNG file info");
++  
++  povpng_info->png_ptr = NULL;
++  povpng_info->info_ptr = NULL;
++  povpng_info->o_png_ptr = NULL;
++  povpng_info->row_ptr = NULL;
++  povpng_info->tmp_fp = NULL;
++  
++  handle->private = (void *)povpng_info;
++  
+   return (handle);
+ }
+ 
+@@ -262,8 +272,11 @@
+ 
+ static int Open_Png_File(FILE_HANDLE *handle, char *name, int *width, int *height, int buffer_size, int mode)
+ {
++  POVPNG_INFO *povpng_info;
++  
+   handle->mode = mode;
+   handle->filename = name;
++  povpng_info = (POVPNG_INFO *)(handle->private);
+   
+   switch (mode)
+   {
+@@ -280,7 +293,7 @@
+        * need to use the path, or the rename will fail if the temp file
+        * is not on the same drive as the output file.
+        */
+-      sprintf(tmp_fname, "%s%s.tpn", opts.Output_Path, opts.Scene_Name);
++      sprintf(povpng_info->tmp_fname, "%s%s.tpn", opts.Output_Path, opts.Scene_Name);
+ 
+       /* Move the old output file to a temporary file, so it can be
+        * read in and simultaneously written out to the new output file.
+@@ -289,27 +302,27 @@
+        * to check if a temp file already exists, in case the transfer
+        * has been previously aborted.
+        */
+-      if ((tmp_fp = fopen(tmp_fname,READ_BINFILE_STRING)) == NULL)
++      if ((povpng_info->tmp_fp = fopen(povpng_info->tmp_fname,READ_BINFILE_STRING)) == NULL)
+       {
+         /* The temp file doesn't exist.  Try the original file. */
+-        if ((tmp_fp = fopen(name,READ_BINFILE_STRING)) == NULL)
++        if ((povpng_info->tmp_fp = fopen(name,READ_BINFILE_STRING)) == NULL)
+         {
+           Status_Info("\n");
+           return(0);  /* Neither file exists - start from scratch. */
+         }
+         else /* The original file exists, but the temp file doesn't. */
+         {
+-          fclose(tmp_fp);
++          fclose(povpng_info->tmp_fp);
+ 
+-          if (RENAME_FILE(name,tmp_fname) == RENAME_FILE_ERR)
++          if (RENAME_FILE(name,povpng_info->tmp_fname) == RENAME_FILE_ERR)
+           {
+             Error("\nError making temporary PNG file for continuing trace.\n");
+           }
+ 
+           /* Open the original file (now with a new name) for reading */
+-          if ((tmp_fp = fopen(tmp_fname,READ_BINFILE_STRING)) == NULL)
++          if ((povpng_info->tmp_fp = fopen(povpng_info->tmp_fname,READ_BINFILE_STRING)) == NULL)
+           {
+-            RENAME_FILE(tmp_fname,name); /* Try to rename back - not crucial */
++            RENAME_FILE(povpng_info->tmp_fname,name); /* Try to rename back - not crucial */
+             Error("\nError opening temporary PNG file for continuing trace.\n");
+           }
+         }
+@@ -320,11 +333,11 @@
+        */
+       else if((handle->file = fopen(name,READ_BINFILE_STRING)) != NULL)
+       {
+-        fclose(tmp_fp);
++        fclose(povpng_info->tmp_fp);
+         fclose(handle->file);
+ 
+         Error_Line("\nBoth original and temporary PNG files exist after an interrupted trace.\n");
+-        Error("Please delete either %s or %s (preferrably the smaller).\n",name,tmp_fname);
++        Error("Please delete either %s or %s (preferrably the smaller).\n",name,povpng_info->tmp_fname);
+       }
+ 
+       /* Try to open the new output file for writing.  If we can't, try
+@@ -335,8 +348,8 @@
+       {
+         Status_Info("\n");
+ 
+-        fclose(tmp_fp);
+-        RENAME_FILE(tmp_fname,name);
++        fclose(povpng_info->tmp_fp);
++        RENAME_FILE(povpng_info->tmp_fname,name);
+         return(-1);
+       }
+ 
+@@ -349,14 +362,14 @@
+       handle->buffer_size = buffer_size;
+ 
+       /* The original input file */
+-      if ((o_png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
++      if ((povpng_info->o_png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
+                        (png_voidp)FALSE, png_pov_err, png_pov_warn)) == NULL ||
+-          (info_ptr = png_create_info_struct(o_png_ptr)) == NULL)
++          (povpng_info->info_ptr = png_create_info_struct(povpng_info->o_png_ptr)) == NULL)
+       {
+         Error("Error allocating PNG data structures");
+       }
+ 
+-      if (setjmp(o_png_ptr->jmpbuf))
++      if (setjmp(povpng_info->o_png_ptr->jmpbuf))
+       {
+         /* If we get here, we had a problem reading the file */
+         Status_Info("\n");
+@@ -367,23 +380,23 @@
+           handle->buffer = NULL;
+         }
+ 
+-        png_destroy_read_struct(&o_png_ptr, &info_ptr, (png_infopp)NULL);
++        png_destroy_read_struct(&(povpng_info->o_png_ptr), &(povpng_info->info_ptr), (png_infopp)NULL);
+ 
+         fclose(handle->file);
+         handle->file = NULL;
+-        fclose(tmp_fp);
+-        tmp_fp = NULL;
++        fclose(povpng_info->tmp_fp);
++        povpng_info->tmp_fp = NULL;
+ 
+         return(0);
+       }
+ 
+       /* Set up the compression structure */
+-      png_init_io(o_png_ptr, tmp_fp);
++      png_init_io(povpng_info->o_png_ptr, povpng_info->tmp_fp);
+ 
+       /* Read in header info from the file */
+-      png_read_info(o_png_ptr, info_ptr);
++      png_read_info(povpng_info->o_png_ptr, povpng_info->info_ptr);
+ 
+-      if (info_ptr->color_type & ~(PNG_COLOR_MASK_COLOR | PNG_COLOR_MASK_ALPHA))
++      if (povpng_info->info_ptr->color_type & ~(PNG_COLOR_MASK_COLOR | PNG_COLOR_MASK_ALPHA))
+       {
+         return(0);
+       }
+@@ -391,13 +404,13 @@
+       Status_Info("\nResuming interrupted trace from %s",handle->filename);
+ 
+       /* The new output file.  Thank god for re-entrant libpng/libz code! */
+-      if ((png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
++      if ((povpng_info->png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
+                      (png_voidp)TRUE, png_pov_err, png_pov_warn)) == NULL)
+       {
+         Error("Error allocating PNG data structures");
+       }
+ 
+-      if (setjmp(png_ptr->jmpbuf))
++      if (setjmp(povpng_info->png_ptr->jmpbuf))
+       {
+         /* If we get here, we had a problem writing the file */
+         Status_Info("\n");
+@@ -408,78 +421,78 @@
+           handle->buffer = NULL;
+         }
+ 
+-        png_destroy_read_struct(&o_png_ptr, &info_ptr, (png_infopp)NULL);
+-        png_destroy_write_struct(&png_ptr, (png_infopp)NULL);
++        png_destroy_read_struct(&(povpng_info->o_png_ptr), &(povpng_info->info_ptr), (png_infopp)NULL);
++        png_destroy_write_struct(&(povpng_info->png_ptr), (png_infopp)NULL);
+ 
+         fclose(handle->file);
+         handle->file = NULL;
+-        fclose(tmp_fp);
+-        tmp_fp = NULL;
++        fclose(povpng_info->tmp_fp);
++        povpng_info->tmp_fp = NULL;
+ 
+         if (DELETE_FILE(name) != DELETE_FILE_ERR)
+         {
+-          RENAME_FILE(tmp_fname,name);  /* Try to get the original file back */
++          RENAME_FILE(povpng_info->tmp_fname,name);  /* Try to get the original file back */
+         }
+ 
+         return(-1);
+       }
+ 
+       /* Set up the compression structure */
+-      png_init_io(png_ptr, handle->file);
++      png_init_io(povpng_info->png_ptr, handle->file);
+ 
+       /* Fill in the relevant image information from the resumed file */
+-      *width = handle->width = info_ptr->width;
+-      *height = handle->height = info_ptr->height;
++      *width = handle->width = povpng_info->info_ptr->width;
++      *height = handle->height = povpng_info->info_ptr->height;
+ 
+       /* Find out if file is a valid format, and if it had Alpha in it */
+-      if (info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
++      if (povpng_info->info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
+       {
+         opts.Options |= OUTPUT_ALPHA;
+       }
+ 
+-      if ((info_ptr->color_type & PNG_COLOR_MASK_COLOR) == PNG_COLOR_TYPE_GRAY)
++      if ((povpng_info->info_ptr->color_type & PNG_COLOR_MASK_COLOR) == PNG_COLOR_TYPE_GRAY)
+       {
+         opts.Options |= HF_GRAY_16;
+         opts.PaletteOption = GREY;       /* Force grayscale preview */
+       }
+ 
+ #if defined(PNG_READ_sBIT_SUPPORTED)
+-      if (info_ptr->valid & PNG_INFO_sBIT)
++      if (povpng_info->info_ptr->valid & PNG_INFO_sBIT)
+       {
+-        if (info_ptr->color_type & PNG_COLOR_MASK_COLOR)
++        if (povpng_info->info_ptr->color_type & PNG_COLOR_MASK_COLOR)
+         {
+-          opts.OutputQuality = info_ptr->sig_bit.red;
++          opts.OutputQuality = povpng_info->info_ptr->sig_bit.red;
+         }
+         else
+         {
+-          opts.OutputQuality = info_ptr->sig_bit.gray;
++          opts.OutputQuality = povpng_info->info_ptr->sig_bit.gray;
+         }
+       }
+ 
+ #else /* !PNG_READ_sBIT_SUPPORTED */
+-      if (info_ptr->bit_depth == 8 && opts.OutputQuality > 8 ||
+-          info_ptr->bit_depth == 16 && opts.OutputQuality <= 8)
++      if (povpng_info->info_ptr->bit_depth == 8 && opts.OutputQuality > 8 ||
++          povpng_info->info_ptr->bit_depth == 16 && opts.OutputQuality <= 8)
+       {
+         Error("\nSpecified color depth +fn%d not the same as depth %d in %s\n",
+-              opts.OutputQuality, info_ptr->bit_depth, name);
++              opts.OutputQuality, povpng_info->info_ptr->bit_depth, name);
+       }
+ #endif /* !PNG_READ_sBIT_SUPPORTED */
+ 
+ #if defined(PNG_READ_oFFs_SUPPORTED)
+-      opts.First_Column = info_ptr->x_offset;
+-      opts.First_Line   = info_ptr->y_offset;
++      opts.First_Column = povpng_info->info_ptr->x_offset;
++      opts.First_Line   = povpng_info->info_ptr->y_offset;
+ #endif /* PNG_READ_oFFs_SUPPORTED */
+ 
+-      png_write_info(png_ptr, info_ptr);
++      png_write_info(povpng_info->png_ptr, povpng_info->info_ptr);
+ 
+-      png_stride = info_ptr->color_type & PNG_COLOR_MASK_COLOR ? 3 : 1;
++      povpng_info->png_stride = povpng_info->info_ptr->color_type & PNG_COLOR_MASK_COLOR ? 3 : 1;
+ 
+-      if (info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
+-        png_stride++;
++      if (povpng_info->info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
++        povpng_info->png_stride++;
+ 
+-      png_stride *= (opts.OutputQuality + 7) / 8;
++      povpng_info->png_stride *= (opts.OutputQuality + 7) / 8;
+ 
+-      row_ptr = (png_byte *)POV_MALLOC(*width*png_stride,"PNG read row buffer");
++      povpng_info->row_ptr = (png_byte *)POV_MALLOC(*width*povpng_info->png_stride,"PNG read row buffer");
+       break;
+ 
+     case WRITE_MODE:
+@@ -502,14 +515,14 @@
+ 
+       handle->buffer_size = buffer_size;
+ 
+-      if ((png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
++      if ((povpng_info->png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
+                      (png_voidp)TRUE, png_pov_err, png_pov_warn)) == NULL ||
+-          (info_ptr = png_create_info_struct(png_ptr)) == NULL)
++          (povpng_info->info_ptr = png_create_info_struct(povpng_info->png_ptr)) == NULL)
+       {
+         Error("Error allocating PNG data structures");
+       }
+ 
+-      if (setjmp(png_ptr->jmpbuf))
++      if (setjmp(povpng_info->png_ptr->jmpbuf))
+       {
+         /* If we get here, we had a problem writing the file */
+         if (handle->buffer != NULL)
+@@ -518,7 +531,7 @@
+           handle->buffer = NULL;
+         }
+ 
+-        png_destroy_write_struct(&png_ptr, &info_ptr);
++        png_destroy_write_struct(&(povpng_info->png_ptr), &(povpng_info->info_ptr));
+ 
+         fclose(handle->file);
+         handle->file = NULL;
+@@ -528,71 +541,71 @@
+ 
+       /* Set up the compression structure */
+ 
+-      png_init_io(png_ptr, handle->file);
++      png_init_io(povpng_info->png_ptr, handle->file);
+ 
+       /* Fill in the relevant image information */
+ 
+-      info_ptr->width = handle->width = *width;
+-      info_ptr->height = handle->height = *height;
++      povpng_info->info_ptr->width = handle->width = *width;
++      povpng_info->info_ptr->height = handle->height = *height;
+ 
+-      info_ptr->bit_depth = 8 * ((opts.OutputQuality + 7) / 8);
++      povpng_info->info_ptr->bit_depth = 8 * ((opts.OutputQuality + 7) / 8);
+ 
+       if (opts.Options & HF_GRAY_16)
+       {
+-        info_ptr->color_type = PNG_COLOR_TYPE_GRAY;
++        povpng_info->info_ptr->color_type = PNG_COLOR_TYPE_GRAY;
+       }
+       else
+       {
+-        info_ptr->color_type = PNG_COLOR_TYPE_RGB;
++        povpng_info->info_ptr->color_type = PNG_COLOR_TYPE_RGB;
+       }
+ 
+       if (opts.Options & OUTPUT_ALPHA)
+       {
+-        info_ptr->color_type |= PNG_COLOR_MASK_ALPHA;
++        povpng_info->info_ptr->color_type |= PNG_COLOR_MASK_ALPHA;
+       }
+ 
+ #if defined(PNG_WRITE_sBIT_SUPPORTED)
+-      if (info_ptr->color_type & PNG_COLOR_MASK_COLOR)
++      if (povpng_info->info_ptr->color_type & PNG_COLOR_MASK_COLOR)
+       {
+-        info_ptr->sig_bit.red =
+-        info_ptr->sig_bit.green =
+-        info_ptr->sig_bit.blue = opts.OutputQuality;
++        povpng_info->info_ptr->sig_bit.red =
++        povpng_info->info_ptr->sig_bit.green =
++        povpng_info->info_ptr->sig_bit.blue = opts.OutputQuality;
+       }
+       else
+       {
+-        info_ptr->sig_bit.gray = opts.OutputQuality;
++        povpng_info->info_ptr->sig_bit.gray = opts.OutputQuality;
+       }
+ 
+-      if (info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
++      if (povpng_info->info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
+       {
+-        info_ptr->sig_bit.alpha = opts.OutputQuality;
++        povpng_info->info_ptr->sig_bit.alpha = opts.OutputQuality;
+       }
+ 
+-      info_ptr->valid |= PNG_INFO_sBIT;
++      povpng_info->info_ptr->valid |= PNG_INFO_sBIT;
+ #endif /* PNG_WRITE_sBIT_SUPPORTED */
+ 
+ #if defined(PNG_WRITE_gAMA_SUPPORTED)
+       if (handle->file_type & (IMAGE_FTYPE | GRAY_FTYPE))
+       {
+-        info_ptr->gamma = 1.0/opts.DisplayGamma;
+-        info_ptr->valid |= PNG_INFO_gAMA;
++        povpng_info->info_ptr->gamma = 1.0/opts.DisplayGamma;
++        povpng_info->info_ptr->valid |= PNG_INFO_gAMA;
+       }
+       else if (handle->file_type & (HIST_FTYPE | HF_FTYPE))
+       {
+-        info_ptr->gamma = 1.0;
+-        info_ptr->valid |= PNG_INFO_gAMA;
++        povpng_info->info_ptr->gamma = 1.0;
++        povpng_info->info_ptr->valid |= PNG_INFO_gAMA;
+       }
+ #endif /* PNG_WRITE_gAMA_SUPPORTED */
+ 
+ #if defined(PNG_WRITE_oFFs_SUPPORTED)
+       if (opts.First_Column != 0 || opts.First_Line != 0)
+       {
+-        info_ptr->x_offset = opts.First_Column;
+-        info_ptr->y_offset = opts.First_Line;
++        povpng_info->info_ptr->x_offset = opts.First_Column;
++        povpng_info->info_ptr->y_offset = opts.First_Line;
+ 
+-        info_ptr->offset_unit_type = PNG_OFFSET_PIXEL;
++        povpng_info->info_ptr->offset_unit_type = PNG_OFFSET_PIXEL;
+ 
+-        info_ptr->valid |= PNG_INFO_oFFs;
++        povpng_info->info_ptr->valid |= PNG_INFO_oFFs;
+       }
+ #endif /* PNG_WRITE_oFFs_SUPPORTED */
+ 
+@@ -605,22 +618,22 @@
+        */
+       }
+ 
+-      png_write_info(png_ptr, info_ptr);
++      png_write_info(povpng_info->png_ptr, povpng_info->info_ptr);
+ 
+-      png_stride = info_ptr->color_type & PNG_COLOR_MASK_COLOR ? 3 : 1;
++      povpng_info->png_stride = povpng_info->info_ptr->color_type & PNG_COLOR_MASK_COLOR ? 3 : 1;
+ 
+-      if (info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
+-        png_stride++;
++      if (povpng_info->info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
++        povpng_info->png_stride++;
+ 
+-      png_stride *= (opts.OutputQuality + 7) / 8;
++      povpng_info->png_stride *= (opts.OutputQuality + 7) / 8;
+ 
+-      row_ptr = (png_byte *)POV_MALLOC(*width*png_stride, "PNG write row buffer");
++      povpng_info->row_ptr = (png_byte *)POV_MALLOC(*width*povpng_info->png_stride, "PNG write row buffer");
+ 
+ #if defined(PNG_WRITE_FLUSH_SUPPORTED)
+       /* Set libpng to flush the output buffers every few lines, so that
+        * in case of a rude crash we don't lose very much data.
+        */
+-      png_set_flush(png_ptr, FLUSH_DIST);
++      png_set_flush(povpng_info->png_ptr, FLUSH_DIST);
+ #endif /* PNG_WRITE_FLUSH_SUPPORTED */
+ 
+       break;
+@@ -628,7 +641,7 @@
+     case APPEND_MODE:
+ 
+ #if defined(PNG_WRITE_FLUSH_SUPPORTED)
+-      if (setjmp(png_ptr->jmpbuf))
++      if (setjmp(povpng_info->png_ptr->jmpbuf))
+       {
+         /* If we get here, we had a problem writing the file */
+ 
+@@ -638,7 +651,7 @@
+           handle->buffer = NULL;
+         }
+ 
+-        png_destroy_write_struct(&png_ptr, &info_ptr);
++        png_destroy_write_struct(&(povpng_info->png_ptr), &(povpng_info->info_ptr));
+ 
+         fclose(handle->file);
+         handle->file = NULL;
+@@ -649,8 +662,8 @@
+       /* Write out the data in the PNG/zlib buffers, and set automatic
+        * flushing for every few scanlines, in case of a rude crash.
+        */
+-      png_write_flush(png_ptr);
+-      png_set_flush(png_ptr, FLUSH_DIST);
++      png_write_flush(povpng_info->png_ptr);
++      png_set_flush(povpng_info->png_ptr, FLUSH_DIST);
+ #else  /* !PNG_WRITE_FLUSH_SUPPORTED */
+       fflush(handle->file);
+ #endif /* PNG_WRITE_FLUSH_SUPPORTED */
+@@ -664,7 +677,7 @@
+           handle->buffer = NULL;
+         }
+ 
+-        png_destroy_write_struct(&png_ptr, &info_ptr);
++        png_destroy_write_struct(&(povpng_info->png_ptr), &(povpng_info->info_ptr));
+ 
+         return(0);
+       }
+@@ -672,14 +685,14 @@
+       /* Delete the temporary data file.  Note that the new output file
+        * is all ready to go - nothing needs to be done here.
+        */
+-      if (tmp_fp != NULL)
++      if (povpng_info->tmp_fp != NULL)
+       {
+-        fclose(tmp_fp);
+-        tmp_fp = NULL;
++        fclose(povpng_info->tmp_fp);
++        povpng_info->tmp_fp = NULL;
+ 
+-        if (DELETE_FILE(tmp_fname) == DELETE_FILE_ERR)
++        if (DELETE_FILE(povpng_info->tmp_fname) == DELETE_FILE_ERR)
+         {
+-          Warning(0.0,"Can't delete temporary PNG file %s.  Please delete it.\n",tmp_fname);
++          Warning(0.0,"Can't delete temporary PNG file %s.  Please delete it.\n",povpng_info->tmp_fname);
+         }
+       }
+   }
+@@ -723,6 +736,9 @@
+   register int col, j;
+   int himask;
+   int color;
++  POVPNG_INFO *povpng_info;
++  
++  povpng_info = (POVPNG_INFO *)(handle->private);
+ 
+ 
+   /*
+@@ -745,142 +761,142 @@
+ 
+       himask = 0xFF ^ ((1 << (8 - opts.OutputQuality)) - 1);
+ 
+-      if ((info_ptr->color_type & PNG_COLOR_MASK_COLOR) == PNG_COLOR_TYPE_GRAY)
++      if ((povpng_info->info_ptr->color_type & PNG_COLOR_MASK_COLOR) == PNG_COLOR_TYPE_GRAY)
+       {
+-        for (col = j = 0; col < handle->width; col++, j += png_stride)
++        for (col = j = 0; col < handle->width; col++, j += povpng_info->png_stride)
+         {
+           color = (png_byte)floor((line_data[col][RED]*0.30 +
+                                    line_data[col][GREEN]*0.59 +
+                                    line_data[col][BLUE]*0.11) * 255.0);
+ 
+           /* Use left-bit replication (LBR) for bit depths < 8 */
+-          row_ptr[j] = color & himask;
+-          row_ptr[j] |= color >> opts.OutputQuality;
++          povpng_info->row_ptr[j] = color & himask;
++          povpng_info->row_ptr[j] |= color >> opts.OutputQuality;
+ 
+           /* Handle Alpha here if needed - must use exact bit replication
+            * instead of truncation or 100... termination
+            */
+-          if (info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
++          if (povpng_info->info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
+           {
+             color = 255 - (int)floor(line_data[col][TRANSM] * 255.0);
+ 
+-            row_ptr[j + 1] = color & himask;
+-            row_ptr[j + 1] |= color >> opts.OutputQuality;
++            povpng_info->row_ptr[j + 1] = color & himask;
++            povpng_info->row_ptr[j + 1] |= color >> opts.OutputQuality;
+           }
+         }
+       }
+       else
+       {
+-        for (col = j = 0; col < handle->width; col++, j += png_stride)
++        for (col = j = 0; col < handle->width; col++, j += povpng_info->png_stride)
+         {
+           color = (int)floor(line_data[col][RED]   * 255.0);
+ 
+-          row_ptr[j] = color & himask;
+-          row_ptr[j] |= color >> opts.OutputQuality;
++          povpng_info->row_ptr[j] = color & himask;
++          povpng_info->row_ptr[j] |= color >> opts.OutputQuality;
+ 
+           color = (int)floor(line_data[col][GREEN] * 255.0);
+ 
+-          row_ptr[j + 1] = color & himask;
+-          row_ptr[j + 1] |= color >> opts.OutputQuality;
++          povpng_info->row_ptr[j + 1] = color & himask;
++          povpng_info->row_ptr[j + 1] |= color >> opts.OutputQuality;
+ 
+           color = (int)floor(line_data[col][BLUE]  * 255.0);
+ 
+-          row_ptr[j + 2] = color & himask;
+-          row_ptr[j + 2] |= color >> opts.OutputQuality;
++          povpng_info->row_ptr[j + 2] = color & himask;
++          povpng_info->row_ptr[j + 2] |= color >> opts.OutputQuality;
+ 
+           /* Handle Alpha here if needed */
+-          if (info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
++          if (povpng_info->info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
+           {
+             color = 255 - (int)floor(line_data[col][TRANSM] * 255.0);
+ 
+-            row_ptr[j + 3] = color & himask;
+-            row_ptr[j + 3] |= color >> opts.OutputQuality;
++            povpng_info->row_ptr[j + 3] = color & himask;
++            povpng_info->row_ptr[j + 3] |= color >> opts.OutputQuality;
+           }
+         }
+       }
+       break;
+ 
+     case 8:
+-      if ((info_ptr->color_type & PNG_COLOR_MASK_COLOR) == PNG_COLOR_TYPE_GRAY)
++      if ((povpng_info->info_ptr->color_type & PNG_COLOR_MASK_COLOR) == PNG_COLOR_TYPE_GRAY)
+       {
+-        for (col = j = 0; col < handle->width; col++, j += png_stride)
++        for (col = j = 0; col < handle->width; col++, j += povpng_info->png_stride)
+         {
+-          row_ptr[j] = (png_byte)floor((line_data[col][RED]*0.30 +
++          povpng_info->row_ptr[j] = (png_byte)floor((line_data[col][RED]*0.30 +
+                                         line_data[col][GREEN]*0.59 +
+                                         line_data[col][BLUE]*0.11) * 255.0);
+ 
+           /* Handle Alpha here if needed */
+-          if (info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
++          if (povpng_info->info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
+           {
+-            row_ptr[j+1] = (png_byte)(255-floor(line_data[col][TRANSM]*255.0));
++            povpng_info->row_ptr[j+1] = (png_byte)(255-floor(line_data[col][TRANSM]*255.0));
+           }
+         }
+       }
+       else
+       {
+-        for (col = j = 0; col < handle->width; col++, j += png_stride)
++        for (col = j = 0; col < handle->width; col++, j += povpng_info->png_stride)
+         {
+-          row_ptr[j] = (png_byte)floor(line_data[col][RED]   * 255.0);
+-          row_ptr[j + 1] = (png_byte)floor(line_data[col][GREEN] * 255.0);
+-          row_ptr[j + 2] = (png_byte)floor(line_data[col][BLUE]  * 255.0);
++          povpng_info->row_ptr[j] = (png_byte)floor(line_data[col][RED]   * 255.0);
++          povpng_info->row_ptr[j + 1] = (png_byte)floor(line_data[col][GREEN] * 255.0);
++          povpng_info->row_ptr[j + 2] = (png_byte)floor(line_data[col][BLUE]  * 255.0);
+ 
+           /* Handle Alpha here if needed */
+-          if (info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
++          if (povpng_info->info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
+           {
+-            row_ptr[j+3] = (png_byte)(255-floor(line_data[col][TRANSM]*255.0));
++            povpng_info->row_ptr[j+3] = (png_byte)(255-floor(line_data[col][TRANSM]*255.0));
+           }
+         }
+       }
+       break;
+ 
+     case 16:
+-      if ((info_ptr->color_type & PNG_COLOR_MASK_COLOR) == PNG_COLOR_TYPE_GRAY)
++      if ((povpng_info->info_ptr->color_type & PNG_COLOR_MASK_COLOR) == PNG_COLOR_TYPE_GRAY)
+       {
+-        for (col = j = 0; col < handle->width; col++, j += png_stride)
++        for (col = j = 0; col < handle->width; col++, j += povpng_info->png_stride)
+         {
+           color = (int)floor((line_data[col][RED]*0.30 +
+                               line_data[col][GREEN]*0.59 +
+                               line_data[col][BLUE]*0.11) * 65535.0);
+ 
+-          row_ptr[j] = color >> 8;
+-          row_ptr[j + 1] = color & 0xFF;
++          povpng_info->row_ptr[j] = color >> 8;
++          povpng_info->row_ptr[j + 1] = color & 0xFF;
+ 
+           /* Handle Alpha here if needed */
+-          if (info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
++          if (povpng_info->info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
+           {
+             color = 65535 - (int)floor(line_data[col][TRANSM]  * 65535.0);
+ 
+-            row_ptr[j + 2] = color >> 8;
+-            row_ptr[j + 3] = color & 0xFF;
++            povpng_info->row_ptr[j + 2] = color >> 8;
++            povpng_info->row_ptr[j + 3] = color & 0xFF;
+           }
+         }
+       }
+       else
+       {
+-        for (col = j = 0; col < handle->width; col++, j += png_stride)
++        for (col = j = 0; col < handle->width; col++, j += povpng_info->png_stride)
+         {
+           color = (int)floor(line_data[col][RED]   * 65535.0);
+ 
+-          row_ptr[j] = color >> 8;
+-          row_ptr[j + 1] = color & 0xFF;
++          povpng_info->row_ptr[j] = color >> 8;
++          povpng_info->row_ptr[j + 1] = color & 0xFF;
+ 
+           color = (int)floor(line_data[col][GREEN] * 65535.0);
+ 
+-          row_ptr[j + 2] = color >> 8;
+-          row_ptr[j + 3] = color & 0xFF;
++          povpng_info->row_ptr[j + 2] = color >> 8;
++          povpng_info->row_ptr[j + 3] = color & 0xFF;
+ 
+           color = (int)floor(line_data[col][BLUE]  * 65535.0);
+ 
+-          row_ptr[j + 4] = color >> 8;
+-          row_ptr[j + 5] = color & 0xFF;
++          povpng_info->row_ptr[j + 4] = color >> 8;
++          povpng_info->row_ptr[j + 5] = color & 0xFF;
+ 
+           /* Handle Alpha here if needed */
+-          if (info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
++          if (povpng_info->info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
+           {
+             color = 65535 - (int)floor(line_data[col][TRANSM]  * 65535.0);
+ 
+-            row_ptr[j + 6] = color >> 8;
+-            row_ptr[j + 7] = color & 0xFF;
++            povpng_info->row_ptr[j + 6] = color >> 8;
++            povpng_info->row_ptr[j + 7] = color & 0xFF;
+           }
+         }
+       }
+@@ -890,60 +906,60 @@
+       /* Handle shifting for arbitrary output bit depth */
+       himask = 0xFF ^ ((1 << (16 - opts.OutputQuality)) - 1);
+ 
+-      if ((info_ptr->color_type & PNG_COLOR_MASK_COLOR) == PNG_COLOR_TYPE_GRAY)
++      if ((povpng_info->info_ptr->color_type & PNG_COLOR_MASK_COLOR) == PNG_COLOR_TYPE_GRAY)
+       {
+-        for (col = j = 0; col < handle->width; col++, j += png_stride)
++        for (col = j = 0; col < handle->width; col++, j += povpng_info->png_stride)
+         {
+           color = (int)floor((line_data[col][RED]*0.30 +
+                               line_data[col][GREEN]*0.59 +
+                               line_data[col][BLUE]*0.11) * 65535.0);
+ 
+-          row_ptr[j] = color >> 8;
+-          row_ptr[j + 1] = color & himask;
++          povpng_info->row_ptr[j] = color >> 8;
++          povpng_info->row_ptr[j + 1] = color & himask;
+ 
+-          if (info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
++          if (povpng_info->info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
+           {
+             color = 65535 - (int)floor(line_data[col][TRANSM] * 65535.0);
+ 
+-            row_ptr[j + 2] = color >> 8;
+-            row_ptr[j + 3] = color & himask;
+-            row_ptr[j + 3] |= color >> opts.OutputQuality;
++            povpng_info->row_ptr[j + 2] = color >> 8;
++            povpng_info->row_ptr[j + 3] = color & himask;
++            povpng_info->row_ptr[j + 3] |= color >> opts.OutputQuality;
+           }
+         }
+       }
+       else
+       {
+-        for (col = j = 0; col < handle->width; col++, j += png_stride)
++        for (col = j = 0; col < handle->width; col++, j += povpng_info->png_stride)
+         {
+           color = (int)floor(line_data[col][RED]   * 65535.0);
+ 
+-          row_ptr[j] = color >> 8;
+-          row_ptr[j + 1] = color & himask;
++          povpng_info->row_ptr[j] = color >> 8;
++          povpng_info->row_ptr[j + 1] = color & himask;
+ 
+           color = (int)floor(line_data[col][GREEN] * 65535.0);
+ 
+-          row_ptr[j + 2] = color >> 8;
+-          row_ptr[j + 3] = color & himask;
++          povpng_info->row_ptr[j + 2] = color >> 8;
++          povpng_info->row_ptr[j + 3] = color & himask;
+ 
+           color = (int)floor(line_data[col][BLUE]  * 65535.0);
+ 
+-          row_ptr[j + 4] = color >> 8;
+-          row_ptr[j + 5] = color & himask;
++          povpng_info->row_ptr[j + 4] = color >> 8;
++          povpng_info->row_ptr[j + 5] = color & himask;
+ 
+           /* Handle Alpha here if needed */
+-          if (info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
++          if (povpng_info->info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
+           {
+             color = 65535 - (int)floor(line_data[col][TRANSM]  * 65535.0);
+ 
+-            row_ptr[j + 6] = color >> 8;
+-            row_ptr[j + 7] = color & himask;
+-            row_ptr[j + 7] |= color >> opts.OutputQuality;
++            povpng_info->row_ptr[j + 6] = color >> 8;
++            povpng_info->row_ptr[j + 7] = color & himask;
++            povpng_info->row_ptr[j + 7] |= color >> opts.OutputQuality;
+           }
+         }
+       }
+   }
+ 
+-  if (setjmp(png_ptr->jmpbuf))
++  if (setjmp(povpng_info->png_ptr->jmpbuf))
+   {
+     /* If we get here, we had a problem writing the file */
+     fclose(handle->file);
+@@ -953,7 +969,7 @@
+   }
+ 
+   /* Write out a scanline */
+-  png_write_row(png_ptr, row_ptr);
++  png_write_row(povpng_info->png_ptr, povpng_info->row_ptr);
+ 
+   /* Close and reopen file (if not stdout) for integrity in case we crash */
+   if (handle->buffer_size == 0 && !(opts.Options & TO_STDOUT))
+@@ -995,8 +1011,11 @@
+ static int Read_Png_Line(FILE_HANDLE *handle, COLOUR *line_data, int *line_number)
+ {
+   register int col, j, step;
++  POVPNG_INFO *povpng_info;
++  
++  povpng_info = (POVPNG_INFO *)(handle->private);
+ 
+-  if (setjmp(o_png_ptr->jmpbuf))
++  if (setjmp(povpng_info->o_png_ptr->jmpbuf))
+   {
+     /* If we get here, we had a problem reading the file, which probably
+      * means that we have read all the available data, rather than a real
+@@ -1006,29 +1025,29 @@
+     return(0);
+   }
+ 
+-  if (setjmp(png_ptr->jmpbuf))
++  if (setjmp(povpng_info->png_ptr->jmpbuf))
+   {
+     /* If we get here, we had a problem writing the new file */
+     Status_Info("\n");
+ 
+     fclose(handle->file);
+     handle->file = NULL;
+-    fclose(tmp_fp);
+-    tmp_fp = NULL;
++    fclose(povpng_info->tmp_fp);
++    povpng_info->tmp_fp = NULL;
+ 
+     if (DELETE_FILE(handle->filename) != DELETE_FILE_ERR)
+     {
+-      RENAME_FILE(tmp_fname,handle->filename); /* Move original file back */
++      RENAME_FILE(povpng_info->tmp_fname,handle->filename); /* Move original file back */
+     }
+ 
+     return(-1);
+   }
+ 
+   /* Read in another row if available */
+-  png_read_row(o_png_ptr, row_ptr, NULL);
++  png_read_row(povpng_info->o_png_ptr, povpng_info->row_ptr, NULL);
+ 
+   /* We won't get here if there was a read error */
+-  png_write_row(png_ptr, row_ptr);
++  png_write_row(povpng_info->png_ptr, povpng_info->row_ptr);
+ 
+   if (*line_number % 32 == 31)
+     Status_Info(".");
+@@ -1042,33 +1061,33 @@
+    */
+ 
+   /* How many bytes in a sample */
+-  step = (info_ptr->bit_depth <= 8) ? 1 : 2;
++  step = (povpng_info->info_ptr->bit_depth <= 8) ? 1 : 2;
+ 
+-  if ((info_ptr->color_type & PNG_COLOR_MASK_COLOR) == PNG_COLOR_TYPE_GRAY)
++  if ((povpng_info->info_ptr->color_type & PNG_COLOR_MASK_COLOR) == PNG_COLOR_TYPE_GRAY)
+   {
+-    for (col = j = 0; col < handle->width; col++, j += png_stride)
++    for (col = j = 0; col < handle->width; col++, j += povpng_info->png_stride)
+     {
+-      line_data[col][RED] = (DBL)row_ptr[j] / 255.0;
+-      line_data[col][GREEN] = (DBL)row_ptr[j] / 255.0;
+-      line_data[col][BLUE] = (DBL)row_ptr[j] / 255.0;
++      line_data[col][RED] = (DBL)(povpng_info->row_ptr[j]) / 255.0;
++      line_data[col][GREEN] = (DBL)(povpng_info->row_ptr[j]) / 255.0;
++      line_data[col][BLUE] = (DBL)(povpng_info->row_ptr[j]) / 255.0;
+ 
+-      if (info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
++      if (povpng_info->info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
+       {
+-        line_data[col][TRANSM] = (DBL)(255 - row_ptr[j + step]) / 255.0;
++        line_data[col][TRANSM] = (DBL)(255 - povpng_info->row_ptr[j + step]) / 255.0;
+       }
+     }
+   }
+   else
+   {
+-    for (col = j = 0; col < handle->width; col++, j += png_stride)
++    for (col = j = 0; col < handle->width; col++, j += povpng_info->png_stride)
+     {
+-      line_data[col][RED] = (DBL)row_ptr[j] / 255.0;
+-      line_data[col][GREEN] = (DBL)row_ptr[j + step] / 255.0;
+-      line_data[col][BLUE] = (DBL)row_ptr[j + 2*step] / 255.0;
++      line_data[col][RED] = (DBL)(povpng_info->row_ptr[j]) / 255.0;
++      line_data[col][GREEN] = (DBL)(povpng_info->row_ptr[j + step]) / 255.0;
++      line_data[col][BLUE] = (DBL)(povpng_info->row_ptr[j + 2*step]) / 255.0;
+ 
+-      if (info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
++      if (povpng_info->info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
+       {
+-        line_data[col][TRANSM] = (DBL)(255 - row_ptr[j + 3*step]) / 255.0;
++        line_data[col][TRANSM] = (DBL)(255 - povpng_info->row_ptr[j + 3*step]) / 255.0;
+       }
+     }
+   }
+@@ -1077,9 +1096,9 @@
+    * the next row!
+    */
+ #if defined(PNG_READ_oFFS_SUPPORTED)
+-  *line_number = info_ptr->y_offset + png_ptr->row_number - 1;
++  *line_number = povpng_info->info_ptr->y_offset + povpng_info->png_ptr->row_number - 1;
+ #else
+-  *line_number = png_ptr->row_number - 1;
++  *line_number = povpng_info->png_ptr->row_number - 1;
+ #endif
+ 
+   return(1);
+@@ -1127,6 +1146,9 @@
+                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+ #endif
+ #endif
++  POVPNG_INFO *povpng_info;
++  
++  povpng_info = (POVPNG_INFO *)(handle->private);
+ 
+   /* Why are we here? */
+ 
+@@ -1137,18 +1159,18 @@
+ 
+   if (handle->mode == WRITE_MODE || handle->mode == APPEND_MODE)
+   {
+-    if (png_ptr != NULL)
++    if (povpng_info->png_ptr != NULL)
+     {
+-      if (setjmp(png_ptr->jmpbuf))
++      if (setjmp(povpng_info->png_ptr->jmpbuf))
+       {
+         /* If we get here, we had a problem writing the file */
+ 
+-        png_destroy_write_struct(&png_ptr, &info_ptr);
++        png_destroy_write_struct(&(povpng_info->png_ptr), &(povpng_info->info_ptr));
+ 
+-        if (row_ptr != NULL)
++        if (povpng_info->row_ptr != NULL)
+         {
+-          POV_FREE(row_ptr);
+-          row_ptr = NULL;
++          POV_FREE(povpng_info->row_ptr);
++          povpng_info->row_ptr = NULL;
+         }
+ 
+         if (handle->file != NULL)
+@@ -1166,19 +1188,19 @@
+         Error("Error writing PNG file.");
+       }
+ 
+-      if(png_ptr->row_number < png_ptr->num_rows)
++      if(povpng_info->png_ptr->row_number < povpng_info->png_ptr->num_rows)
+       {
+          /* finished prematurely - trick into thinking done*/
+-         png_ptr->num_rows = png_ptr->row_number;
+-         png_write_finish_row(png_ptr);
++         povpng_info->png_ptr->num_rows = povpng_info->png_ptr->row_number;
++         png_write_finish_row(povpng_info->png_ptr);
+       }
+ 
+ #ifdef POV_COMMENTS /* temporarily skip comment writing code */
+-      if (info_ptr != NULL)
++      if (povpng_info->info_ptr != NULL)
+       {
+ #if defined(PNG_WRITE_tIME_SUPPORTED)
+-        png_convert_from_time_t(&info_ptr->mod_time, tstart);
+-        info_ptr->valid = PNG_INFO_tIME;
++        png_convert_from_time_t(&(povpng_info->info_ptr->mod_time), tstart);
++        povpng_info->info_ptr->valid = PNG_INFO_tIME;
+ #endif /* PNG_WRITE_tIME_SUPPORTED */
+ 
+ #if defined(PNG_WRITE_tEXt_SUPPORTED)
+@@ -1214,9 +1236,9 @@
+         /* Print the image "creation" time in RFC 1123 format */
+         text_ptr[++index].key = "Creation Time";
+         sprintf(bigtext, "%02d %3s %4d %02d:%02d:%02d GMT",
+-                info_ptr->mod_time.day, months[info_ptr->mod_time.month],
+-                info_ptr->mod_time.year, info_ptr->mod_time.hour, 
+-                info_ptr->mod_time.minute, info_ptr->mod_time.second);
++                povpng_info->info_ptr->mod_time.day, months[povpng_info->info_ptr->mod_time.month],
++                povpng_info->info_ptr->mod_time.year, povpng_info->info_ptr->mod_time.hour, 
++                povpng_info->info_ptr->mod_time.minute, povpng_info->info_ptr->mod_time.second);
+         text_ptr[index].text_length = strlen(bigtext);
+         text_ptr[index].text = (char *)POV_MALLOC(text_ptr[index].text_length + 1, "PNG comment");
+         strcpy(text_ptr[index].text, bigtext);
+@@ -1290,8 +1312,8 @@
+       }
+ #endif  /* POV_COMMENTS */ 
+ 
+-      png_write_end(png_ptr, info_ptr);
+-      png_destroy_write_struct(&png_ptr, &info_ptr);
++      png_write_end(povpng_info->png_ptr, povpng_info->info_ptr);
++      png_destroy_write_struct(&(povpng_info->png_ptr), &(povpng_info->info_ptr));
+ 
+ #ifdef POV_COMMENTS
+       if (text_ptr != NULL)
+@@ -1311,10 +1333,10 @@
+ 
+     }
+ 
+-    if (row_ptr != NULL)
++    if (povpng_info->row_ptr != NULL)
+     {
+-      POV_FREE(row_ptr);
+-      row_ptr = NULL;
++      POV_FREE(povpng_info->row_ptr);
++      povpng_info->row_ptr = NULL;
+     }
+ 
+     if (handle->file != NULL && !(opts.Options & TO_STDOUT))
+@@ -1331,9 +1353,9 @@
+   }
+   else /* READ_MODE */
+   {
+-    if (o_png_ptr != NULL)
++    if (povpng_info->o_png_ptr != NULL)
+     {
+-      png_destroy_read_struct(&o_png_ptr, (png_infopp)NULL, (png_infopp)NULL);
++      png_destroy_read_struct(&(povpng_info->o_png_ptr), (png_infopp)NULL, (png_infopp)NULL);
+     }
+   }
+ }
+

@@ -1,12 +1,12 @@
 Summary:	Persistence of Vision Ray Tracer
 Summary(pl):	Persistence of Vision Ray Tracer
 Name:		povray
-Version:	3.1g
-Release:	5
+Version:	3.50a
+Release:	1
 License:	distributable
 Group:		Applications/Graphics
 Source0:	ftp://ftp.povray.org/pub/povray/Official/Unix/povuni_s.tgz
-Source1:	ftp://ftp.povray.org/pub/povray/Official/Unix/povuni_d.tgz
+#Source1:	ftp://ftp.povray.org/pub/povray/Official/Unix/povuni_d.tgz
 # pvm.patch is instead of that source, and its based on it
 #Source2:	pvmpov-3.1e2.tgz
 Patch0:		%{name}-makefile_and_config.patch
@@ -16,13 +16,13 @@ URL:		http://www.povray.org/
 BuildRequires:	zlib-devel
 BuildRequires:	libpng-devel >= 1.0.8
 %{!?_without_x:BuildRequires:XFree86-devel}
-%{!?_without_pvm:BuildRequires:pvm-devel >= 3.4.3-24 }
+#%{!?_without_pvm:BuildRequires:pvm-devel >= 3.4.3-24 }
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 #ugly but now _pvm_root/_pvm_arch isnt defined in macros
 
-%define		_pvm_root	%{_libdir}/pvm3
-%define		_pvm_arch	%(ls %{_pvm_root}/conf/|sed -e 's/\.def//')
+#%define		_pvm_root	%{_libdir}/pvm3
+#%define		_pvm_arch	%(ls %{_pvm_root}/conf/|sed -e 's/\.def//')
 
 %description
 The Persistence of Vision(tm) Ray-Tracer creates three-dimensional,
@@ -88,32 +88,37 @@ PVM/xwin.
 %endif
 
 %prep
-%setup -q -n povray31 -b 1
-%patch0 -p1
-%patch1 -p0
-%patch2 -p1
+#%setup -q -n povray31 -b 1
+#                       ^^^
+%setup -q
+#%patch0 -p1
+#%patch1 -p0
+#%patch2 -p1
 
 %build
-cd source/unix
-%{__make} newunix %{!?_without_x:newxwin} %{!?_without_pvm:newunix_pvm %{!?_without_x:newxwin_pvm}} OPT_FLAGS="%{rpmcflags}"
+#cd source/unix
+#%{__make} newunix %{!?_without_x:newxwin} %{!?_without_pvm:newunix_pvm %{!?_without_x:newxwin_pvm}} OPT_FLAGS="%{rpmcflags}"
+%configure
+%{__make}
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_bindir},/etc/skel,%{_mandir}/man1,%{_datadir}/povray31,%{_pvm_root}/bin/%{_pvm_arch}}
+#install -d $RPM_BUILD_ROOT{%{_bindir},/etc/skel,%{_mandir}/man1,%{_datadir}/povray31,%{_pvm_root}/bin/%{_pvm_arch}}
 
 
-install source/unix/povray $RPM_BUILD_ROOT%{_bindir}
-%{!?_without_x:install source/unix/x-povray $RPM_BUILD_ROOT%{_bindir}}
-%{!?_without_pvm:install source/unix/pvmpov $RPM_BUILD_ROOT%{_pvm_root}/bin/%{_pvm_arch}}
-%{!?_without_pvm:%{!?_without_x:install source/unix/x-pvmpov $RPM_BUILD_ROOT%{_pvm_root}/bin/%{_pvm_arch}}}
-install source/unix/povrayrc $RPM_BUILD_ROOT/etc/skel/.povrayrc
+#install source/unix/povray $RPM_BUILD_ROOT%{_bindir}
+#%{!?_without_x:install source/unix/x-povray $RPM_BUILD_ROOT%{_bindir}}
+#%{!?_without_pvm:install source/unix/pvmpov $RPM_BUILD_ROOT%{_pvm_root}/bin/%{_pvm_arch}}
+#%{!?_without_pvm:%{!?_without_x:install source/unix/x-pvmpov $RPM_BUILD_ROOT%{_pvm_root}/bin/%{_pvm_arch}}}
+#install source/unix/povrayrc $RPM_BUILD_ROOT/etc/skel/.povrayrc
 
-install povray.1 $RPM_BUILD_ROOT%{_mandir}/man1
+#install povray.1 $RPM_BUILD_ROOT%{_mandir}/man1
 
-cp -r allscene include scenes $RPM_BUILD_ROOT%{_datadir}/povray31
-install *.ini *.pov $RPM_BUILD_ROOT%{_datadir}/povray31
+#cp -r allscene include scenes $RPM_BUILD_ROOT%{_datadir}/povray31
+#install *.ini *.pov $RPM_BUILD_ROOT%{_datadir}/povray31
 
-gzip -9nf gamma.gif.txt povlegal.doc povuser.txt
+#gzip -9nf gamma.gif.txt povlegal.doc povuser.txt
+%{__make} install DESTDIR=$RPM_BUILD_ROOT
 
 %clean
 rm -rf $RPM_BUILD_ROOT

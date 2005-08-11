@@ -5,9 +5,9 @@
 #
 #
 # Conditional build:
-%bcond_without x	# - without X11 subpackage
-%bcond_with pvm		# - with PVM support
-%bcond_with svga	# - with svgalib support (doesn't work on many platforms)
+%bcond_without	x	# - without X11 subpackage
+%bcond_with	pvm		# - with PVM support
+%bcond_with	svga	# - with svgalib support (doesn't work on many platforms)
 #
 %define		_src_pov_ver	3.6
 

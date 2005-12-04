@@ -19,7 +19,7 @@ Release:	0.5
 Epoch:		1
 License:	distributable
 Group:		Applications/Graphics
-Source0:	http://www.povray.org/ftp/pub/povray/Official/Unix/povray-%{_src_pov_ver}.tar.bz2
+Source0:	http://www.povray.org/ftp/pub/povray/Official/Unix/%{name}-%{_src_pov_ver}.tar.bz2
 # Source0-md5:	b5789bb7eeaed0809c5c82d0efda571d
 # based on sources from CVS at http://pvmpov.sourceforge.net/
 # Source0:	%{name}-%{version}-%{snap}.tar.gz
@@ -195,7 +195,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/povray*
 %{_docdir}/povray*
 %{_mandir}/man?/*
-%config(noreplace) %verify(not md5 size mtime) %{_sysconfdir}/%{name}/%{_src_pov_ver}/povray.*
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/%{_src_pov_ver}/povray.*
 ## %config(noreplace) %verify(not md5 size mtime) %{_sysconfdir}/povray.*
 
 %if %{with x}

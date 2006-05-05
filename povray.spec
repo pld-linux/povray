@@ -9,13 +9,13 @@
 %bcond_with	pvm		# - with PVM support
 %bcond_with	svga	# - with svgalib support (doesn't work on many platforms)
 #
-%define		_src_pov_ver	3.6
+%define		_src_pov_ver	3.6.1
 
 Summary:	Persistence of Vision Ray Tracer
 Summary(pl):	Persistence of Vision Ray Tracer
 Name:		povray
 Version:	3.6.1
-Release:	0.5
+Release:	0.1
 Epoch:		1
 License:	distributable
 Group:		Applications/Graphics
@@ -29,7 +29,7 @@ Patch2:		%{name}-X-libs.patch
 Patch3:		%{name}-lib64.patch
 Patch4:		%{name}-no_svgalib.patch
 URL:		http://www.povray.org/
-%{?with_x:BuildRequires:	XFree86-devel}
+%{?with_x:BuildRequires:	xorg-lib-libX11-devel}
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	libjpeg-devel
@@ -41,8 +41,10 @@ BuildRequires:	libtiff-devel
 BuildRequires:	zlib-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
+%if %{with pvm}
 %define		_pvmarch	%(/usr/bin/pvmgetarch)
 %define		_pvmroot	/usr/%{_lib}/pvm3
+%endif
 
 %description
 The Persistence of Vision(tm) Ray-Tracer creates three-dimensional,
@@ -77,6 +79,7 @@ The Persistence of Vision(tm) Ray-Tracer X Window executable.
 Plik wykonywalny The Persistence of Vision(tm) Ray-Tracer dla X
 Window.
 
+%if %{with pvm}
 %package pvm
 Summary:	PVM/unix povray executable
 Summary(pl):	Plik wykonywalny povray dla PVM/unix
@@ -102,6 +105,7 @@ The Persistence of Vision(tm) Ray-Tracer PVM/xwin executable.
 %description pvm-X11 -l pl
 Plik wykonywalny The Persistence of Vision(tm) Ray-Tracer dla
 PVM/xwin.
+%endif
 
 %prep
 %setup -q

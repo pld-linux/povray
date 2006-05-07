@@ -1,8 +1,5 @@
-
-#
-# todo:
-#      patch for s#/usr/local#/usr# in povray.ini
-#
+# TODO:
+# - patch for s#/usr/local#/usr# in povray.ini
 #
 # Conditional build:
 %bcond_without	x	# - without X11 subpackage
@@ -79,7 +76,6 @@ The Persistence of Vision(tm) Ray-Tracer X Window executable.
 Plik wykonywalny The Persistence of Vision(tm) Ray-Tracer dla X
 Window.
 
-%if %{with pvm}
 %package pvm
 Summary:	PVM/unix povray executable
 Summary(pl):	Plik wykonywalny povray dla PVM/unix
@@ -105,7 +101,6 @@ The Persistence of Vision(tm) Ray-Tracer PVM/xwin executable.
 %description pvm-X11 -l pl
 Plik wykonywalny The Persistence of Vision(tm) Ray-Tracer dla
 PVM/xwin.
-%endif
 
 %prep
 %setup -q

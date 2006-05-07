@@ -194,7 +194,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/povray*
 %{_docdir}/povray*
 %{_mandir}/man?/*
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/%{_src_pov_ver}/povray.*
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/3.6/povray.*
 ## %config(noreplace) %verify(not md5 size mtime) %{_sysconfdir}/povray.*
 
 %if %{with x}

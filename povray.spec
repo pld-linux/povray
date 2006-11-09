@@ -26,7 +26,6 @@ Patch2:		%{name}-X-libs.patch
 Patch3:		%{name}-lib64.patch
 Patch4:		%{name}-no_svgalib.patch
 URL:		http://www.povray.org/
-%{?with_x:BuildRequires:	xorg-lib-libX11-devel}
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	libjpeg-devel
@@ -35,6 +34,7 @@ BuildRequires:	libstdc++-devel
 BuildRequires:	libtiff-devel
 %{?with_pvm:BuildRequires:	pvm-devel >= 3.4.3-24}
 %{?with_svga:BuildRequires:	svgalib-devel}
+%{?with_x:BuildRequires:	xorg-lib-libX11-devel}
 BuildRequires:	zlib-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -67,7 +67,7 @@ efektami, tj. odbicia ¶wiat³a, cienie, perspektywa i inne.
 Summary:	X Window povray executable
 Summary(pl):	povray pod X Window
 Group:		Applications/Graphics
-Requires:	%{name} = %{version}
+Requires:	%{name} = %{version}-%{release}
 
 %description X11
 The Persistence of Vision(tm) Ray-Tracer X Window executable.
@@ -80,7 +80,7 @@ Window.
 Summary:	PVM/unix povray executable
 Summary(pl):	Plik wykonywalny povray dla PVM/unix
 Group:		Applications/Graphics
-Requires:	%{name} = %{version}
+Requires:	%{name} = %{version}-%{release}
 
 %description pvm
 The Persistence of Vision(tm) Ray-Tracer PVM/unix executable.
@@ -93,7 +93,7 @@ PVM/unix.
 Summary:	PVM/xwin povray executable
 Summary(pl):	Plik wykonywalny povray dla PVM/xwin
 Group:		Applications/Graphics
-Requires:	%{name} = %{version}
+Requires:	%{name} = %{version}-%{release}
 
 %description pvm-X11
 The Persistence of Vision(tm) Ray-Tracer PVM/xwin executable.
@@ -147,7 +147,7 @@ install unix/povray pvmpov
 %configure \
 	--libdir=%{_datadir} \
 	--x-includes=/usr/X11R6/include \
-	--x-libraries=/usr/X11R6/%{_lib} 
+	--x-libraries=/usr/X11R6/%{_lib}
 %{__make}
 install unix/povray x-povray
 %{__make} clean

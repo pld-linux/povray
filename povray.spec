@@ -109,7 +109,7 @@ PVM/xwin.
 %if "%{_lib}" == "lib64"
 ##%patch3 -p1
 %endif
-%if %{without svga}
+%if !%{with svga}
 ##%patch4 -p1
 %endif
 

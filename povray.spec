@@ -1,5 +1,3 @@
-# TODO:
-# - patch for s#/usr/local#/usr# in povray.ini
 #
 # Conditional build:
 %bcond_without	x	# - without X11 subpackage
@@ -12,7 +10,7 @@ Summary:	Persistence of Vision Ray Tracer
 Summary(pl):	Persistence of Vision Ray Tracer
 Name:		povray
 Version:	3.6.1
-Release:	0.1
+Release:	1
 Epoch:		1
 License:	distributable
 Group:		Applications/Graphics
@@ -25,6 +23,7 @@ Patch1:		%{name}-64bit.patch
 Patch2:		%{name}-X-libs.patch
 Patch3:		%{name}-lib64.patch
 Patch4:		%{name}-no_svgalib.patch
+Patch5:		%{name}-m4.patch
 URL:		http://www.povray.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -112,12 +111,13 @@ PVM/xwin.
 %if !%{with svga}
 ##%patch4 -p1
 %endif
+%patch5 -p1
 
 %build
 %{__aclocal}
 %{__autoconf}
 %{__automake}
-COMPILED_BY="xx";export COMPILED_BY;
+COMPILED_BY="PLD/Linux Team";export COMPILED_BY;
 %if %{with x} && %{with pvm}
 %configure \
 	--libdir=%{_datadir} \
@@ -161,8 +161,10 @@ install unix/povray x-povray
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_sysconfdir},/usr/X11R6/bin} \
-	$RPM_BUILD_ROOT%{_pvmroot}/bin/%{_pvmarch}
+install -d $RPM_BUILD_ROOT{%{_sysconfdir},/usr/X11R6/bin}
+%if %{with pvm}
+install -d $RPM_BUILD_ROOT%{_pvmroot}/bin/%{_pvmarch}
+%endif
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT

@@ -10,7 +10,7 @@ Summary:	Persistence of Vision Ray Tracer
 Summary(pl):	Persistence of Vision Ray Tracer
 Name:		povray
 Version:	3.6.1
-Release:	1
+Release:	2
 Epoch:		1
 License:	distributable
 Group:		Applications/Graphics
@@ -66,7 +66,7 @@ efektami, tj. odbicia ¶wiat³a, cienie, perspektywa i inne.
 Summary:	X Window povray executable
 Summary(pl):	povray pod X Window
 Group:		Applications/Graphics
-Requires:	%{name} = %{version}-%{release}
+Requires:	%{name} = %{epoch}:%{version}-%{release}
 
 %description X11
 The Persistence of Vision(tm) Ray-Tracer X Window executable.
@@ -79,7 +79,7 @@ Window.
 Summary:	PVM/unix povray executable
 Summary(pl):	Plik wykonywalny povray dla PVM/unix
 Group:		Applications/Graphics
-Requires:	%{name} = %{version}-%{release}
+Requires:	%{name} = %{epoch}:%{version}-%{release}
 
 %description pvm
 The Persistence of Vision(tm) Ray-Tracer PVM/unix executable.
@@ -92,7 +92,7 @@ PVM/unix.
 Summary:	PVM/xwin povray executable
 Summary(pl):	Plik wykonywalny povray dla PVM/xwin
 Group:		Applications/Graphics
-Requires:	%{name} = %{version}-%{release}
+Requires:	%{name} = %{epoch}:%{version}-%{release}
 
 %description pvm-X11
 The Persistence of Vision(tm) Ray-Tracer PVM/xwin executable.

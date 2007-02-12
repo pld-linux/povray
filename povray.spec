@@ -7,7 +7,7 @@
 %define		_src_pov_ver	3.6.1
 
 Summary:	Persistence of Vision Ray Tracer
-Summary(pl):	Persistence of Vision Ray Tracer
+Summary(pl.UTF-8):   Persistence of Vision Ray Tracer
 Name:		povray
 Version:	3.6.1
 Release:	2
@@ -52,52 +52,52 @@ not a fast process by any means, but it produces very high quality
 images with realistic reflections, shading, perspective and other
 effects.
 
-%description -l pl
-Persistence of Vision(tm) Ray-Tracer tworzy trójwymiarowe,
-fotorealistyczne obrazy za pomoc± techniki renderingu zwanej
-ray-tracing. Program pobiera z pliku tekstowego informacje opisuj±ce
-obiekty oraz ¶wiat³o przedstawianego ¶wiata, a nastêpnie generuje
-rysunek z punktu widzenia kamery, która tak¿e jest definiowana w w/w
-pliku tekstowym. Ray-tracing nie pozwala na szybkie tworzenie obrazów,
-ale za to twórca otrzymuje wyskokiej jako¶ci bitmapy z realistycznymi
-efektami, tj. odbicia ¶wiat³a, cienie, perspektywa i inne.
+%description -l pl.UTF-8
+Persistence of Vision(tm) Ray-Tracer tworzy trÃ³jwymiarowe,
+fotorealistyczne obrazy za pomocÄ… techniki renderingu zwanej
+ray-tracing. Program pobiera z pliku tekstowego informacje opisujÄ…ce
+obiekty oraz Å›wiatÅ‚o przedstawianego Å›wiata, a nastÄ™pnie generuje
+rysunek z punktu widzenia kamery, ktÃ³ra takÅ¼e jest definiowana w w/w
+pliku tekstowym. Ray-tracing nie pozwala na szybkie tworzenie obrazÃ³w,
+ale za to twÃ³rca otrzymuje wyskokiej jakoÅ›ci bitmapy z realistycznymi
+efektami, tj. odbicia Å›wiatÅ‚a, cienie, perspektywa i inne.
 
 %package X11
 Summary:	X Window povray executable
-Summary(pl):	povray pod X Window
+Summary(pl.UTF-8):   povray pod X Window
 Group:		Applications/Graphics
 Requires:	%{name} = %{epoch}:%{version}-%{release}
 
 %description X11
 The Persistence of Vision(tm) Ray-Tracer X Window executable.
 
-%description X11 -l pl
+%description X11 -l pl.UTF-8
 Plik wykonywalny The Persistence of Vision(tm) Ray-Tracer dla X
 Window.
 
 %package pvm
 Summary:	PVM/unix povray executable
-Summary(pl):	Plik wykonywalny povray dla PVM/unix
+Summary(pl.UTF-8):   Plik wykonywalny povray dla PVM/unix
 Group:		Applications/Graphics
 Requires:	%{name} = %{epoch}:%{version}-%{release}
 
 %description pvm
 The Persistence of Vision(tm) Ray-Tracer PVM/unix executable.
 
-%description pvm -l pl
+%description pvm -l pl.UTF-8
 Plik wykonywalny The Persistence of Vision(tm) Ray-Tracer dla
 PVM/unix.
 
 %package pvm-X11
 Summary:	PVM/xwin povray executable
-Summary(pl):	Plik wykonywalny povray dla PVM/xwin
+Summary(pl.UTF-8):   Plik wykonywalny povray dla PVM/xwin
 Group:		Applications/Graphics
 Requires:	%{name} = %{epoch}:%{version}-%{release}
 
 %description pvm-X11
 The Persistence of Vision(tm) Ray-Tracer PVM/xwin executable.
 
-%description pvm-X11 -l pl
+%description pvm-X11 -l pl.UTF-8
 Plik wykonywalny The Persistence of Vision(tm) Ray-Tracer dla
 PVM/xwin.
 

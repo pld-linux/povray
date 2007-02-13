@@ -7,7 +7,7 @@
 %define		_src_pov_ver	3.6.1
 
 Summary:	Persistence of Vision Ray Tracer
-Summary(pl.UTF-8):   Persistence of Vision Ray Tracer
+Summary(pl.UTF-8):	Persistence of Vision Ray Tracer
 Name:		povray
 Version:	3.6.1
 Release:	2
@@ -64,7 +64,7 @@ efektami, tj. odbicia światła, cienie, perspektywa i inne.
 
 %package X11
 Summary:	X Window povray executable
-Summary(pl.UTF-8):   povray pod X Window
+Summary(pl.UTF-8):	povray pod X Window
 Group:		Applications/Graphics
 Requires:	%{name} = %{epoch}:%{version}-%{release}
 
@@ -77,7 +77,7 @@ Window.
 
 %package pvm
 Summary:	PVM/unix povray executable
-Summary(pl.UTF-8):   Plik wykonywalny povray dla PVM/unix
+Summary(pl.UTF-8):	Plik wykonywalny povray dla PVM/unix
 Group:		Applications/Graphics
 Requires:	%{name} = %{epoch}:%{version}-%{release}
 
@@ -90,7 +90,7 @@ PVM/unix.
 
 %package pvm-X11
 Summary:	PVM/xwin povray executable
-Summary(pl.UTF-8):   Plik wykonywalny povray dla PVM/xwin
+Summary(pl.UTF-8):	Plik wykonywalny povray dla PVM/xwin
 Group:		Applications/Graphics
 Requires:	%{name} = %{epoch}:%{version}-%{release}
 

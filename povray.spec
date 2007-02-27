@@ -10,7 +10,7 @@ Summary:	Persistence of Vision Ray Tracer
 Summary(pl.UTF-8):	Persistence of Vision Ray Tracer
 Name:		povray
 Version:	3.6.1
-Release:	2
+Release:	3
 Epoch:		1
 License:	distributable
 Group:		Applications/Graphics
@@ -196,6 +196,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/povray*
 %{_docdir}/povray*
 %{_mandir}/man?/*
+%dir %{_sysconfdir}/povray
+%dir %{_sysconfdir}/povray/3.6
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/3.6/povray.*
 ## %config(noreplace) %verify(not md5 size mtime) %{_sysconfdir}/povray.*
 

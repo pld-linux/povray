@@ -1,0 +1,29 @@
+--- povray-3.6.1/source/png_pov.cpp.wiget	2010-01-29 21:35:24.000000000 +0100
++++ povray-3.6.1/source/png_pov.cpp	2010-01-29 21:35:33.000000000 +0100
+@@ -782,7 +782,7 @@ PNG_Image::~PNG_Image()
+       {
+          // finished prematurely - trick into thinking done
+          png_ptr->num_rows = png_ptr->row_number;
+-         png_write_finish_row(png_ptr);
++         png_write_row(png_ptr, row_ptr);
+       }
+ 
+ #ifdef POV_COMMENTS // temporarily skip comment writing code 
+@@ -1428,7 +1428,7 @@ void Read_Png_Image(IMAGE *Image, char *
+ 		if(r_info_ptr->valid & PNG_INFO_tRNS)
+ 		{
+ 			for (index = 0; index < r_info_ptr->num_trans; index++)
+-				cmap[index].Transmit = 255 - r_info_ptr->trans[index];
++				cmap[index].Transmit = 255 - r_info_ptr->trans_alpha[index];
+ 		}
+ 
+ 		Image->data.map_lines = (unsigned char **)POV_MALLOC(height * sizeof(unsigned char *), "PNG image");
+@@ -1461,7 +1461,7 @@ void Read_Png_Image(IMAGE *Image, char *
+ 		if(r_info_ptr->valid & PNG_INFO_tRNS)
+ 		{
+ 			for (index = 0; index < r_info_ptr->num_trans; index++)
+-				cmap[index].Transmit = 255 - r_info_ptr->trans[index];
++				cmap[index].Transmit = 255 - r_info_ptr->trans_alpha[index];
+ 		}
+ 
+ 		Image->data.map_lines = (unsigned char **)POV_MALLOC(height * sizeof(unsigned char *), "PNG image");

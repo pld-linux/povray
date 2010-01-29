@@ -10,7 +10,7 @@ Summary:	Persistence of Vision Ray Tracer
 Summary(pl.UTF-8):	Persistence of Vision Ray Tracer
 Name:		povray
 Version:	3.6.1
-Release:	7
+Release:	8
 Epoch:		1
 License:	distributable
 Group:		Applications/Graphics
@@ -24,11 +24,12 @@ Patch2:		%{name}-X-libs.patch
 Patch3:		%{name}-lib64.patch
 Patch4:		%{name}-no_svgalib.patch
 Patch5:		%{name}-m4.patch
+Patch6:		%{name}-png.patch
 URL:		http://www.povray.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	libjpeg-devel
-BuildRequires:	libpng-devel >= 1.0.8
+BuildRequires:	libpng-devel >= 1.4.0
 BuildRequires:	libstdc++-devel
 BuildRequires:	libtiff-devel
 %{?with_pvm:BuildRequires:	pvm-devel >= 3.4.3-24}
@@ -112,6 +113,7 @@ PVM/xwin.
 ##%patch4 -p1
 %endif
 %patch5 -p1
+%patch6 -p1
 
 %build
 %{__aclocal}

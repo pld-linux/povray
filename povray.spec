@@ -1,30 +1,25 @@
 #
 # Conditional build:
 %bcond_without	x	# - without X11 subpackage
-%bcond_with	pvm		# - with PVM support
+%bcond_with	pvm	# - with PVM support
 %bcond_with	svga	# - with svgalib support (doesn't work on many platforms)
 #
-%define		_src_pov_ver	3.6.1
+%define		_src_pov_ver	3.7.0.RC3
 
 Summary:	Persistence of Vision Ray Tracer
 Summary(pl.UTF-8):	Persistence of Vision Ray Tracer
 Name:		povray
-Version:	3.6.1
-Release:	12
+Version:	3.7.0
+Release:	0.RC3.1
 Epoch:		1
 License:	distributable
 Group:		Applications/Graphics
-Source0:	http://www.povray.org/ftp/pub/povray/Official/Unix/%{name}-%{_src_pov_ver}.tar.bz2
-# Source0-md5:	b5789bb7eeaed0809c5c82d0efda571d
+#Source0:	http://www.povray.org/ftp/pub/povray/Official/Unix/%{name}-%{_src_pov_ver}.tar.bz2
+Source0:	http://www.povray.org/redirect/www.povray.org/beta/source/%{name}-%{_src_pov_ver}.tar.bz2
+# Source0-md5:	66480f1ca6b1b1b5198605b6caf3f8e8
 # based on sources from CVS at http://pvmpov.sourceforge.net/
 # Source0:	%{name}-%{version}-%{snap}.tar.gz
-Patch0:		%{name}-legal.patch
-Patch1:		%{name}-64bit.patch
-Patch2:		%{name}-X-libs.patch
-Patch3:		%{name}-lib64.patch
-Patch4:		%{name}-no_svgalib.patch
-Patch5:		%{name}-m4.patch
-Patch6:		%{name}-png.patch
+Source1:	%{name}-ax_boost_base.m4
 URL:		http://www.povray.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -103,17 +98,8 @@ Plik wykonywalny The Persistence of Vision(tm) Ray-Tracer dla
 PVM/xwin.
 
 %prep
-%setup -q
-##%patch1 -p1
-##%patch2 -p1
-%if "%{_lib}" == "lib64"
-##%patch3 -p1
-%endif
-%if !%{with svga}
-##%patch4 -p1
-%endif
-%patch5 -p1
-%patch6 -p1
+%setup -q -n %{name}-%{_src_pov_ver}
+cp %{SOURCE1} unix/config/ax_boost_base.m4
 
 %build
 %{__aclocal}
@@ -193,14 +179,14 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS ChangeLog NEWS README* doc/povlegal.doc doc/*.txt doc/html
+%doc AUTHORS ChangeLog NEWS README* changes.txt
 %attr(755,root,root) %{_bindir}/povray
 %{_datadir}/povray*
 %{_docdir}/povray*
 %{_mandir}/man?/*
 %dir %{_sysconfdir}/povray
-%dir %{_sysconfdir}/povray/3.6
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/3.6/povray.*
+%dir %{_sysconfdir}/povray/3.7
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/3.7/povray.*
 ## %config(noreplace) %verify(not md5 size mtime) %{_sysconfdir}/povray.*
 
 %if %{with x}

@@ -10,7 +10,7 @@ Summary:	Persistence of Vision Ray Tracer
 Summary(pl.UTF-8):	Persistence of Vision Ray Tracer
 Name:		povray
 Version:	3.7.0
-Release:	0.RC3.1
+Release:	0.RC3.2
 Epoch:		1
 License:	distributable
 Group:		Applications/Graphics
@@ -20,6 +20,7 @@ Source0:	http://www.povray.org/redirect/www.povray.org/beta/source/%{name}-%{_sr
 # based on sources from CVS at http://pvmpov.sourceforge.net/
 # Source0:	%{name}-%{version}-%{snap}.tar.gz
 Source1:	%{name}-ax_boost_base.m4
+Patch0:		%{name}-nouserfiles.patch
 URL:		http://www.povray.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -100,6 +101,7 @@ PVM/xwin.
 %prep
 %setup -q -n %{name}-%{_src_pov_ver}
 cp %{SOURCE1} unix/config/ax_boost_base.m4
+%patch0 -p1
 
 %build
 %{__aclocal}

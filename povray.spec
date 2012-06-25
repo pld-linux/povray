@@ -10,7 +10,7 @@ Summary:	Persistence of Vision Ray Tracer
 Summary(pl.UTF-8):	Persistence of Vision Ray Tracer
 Name:		povray
 Version:	3.7.0
-Release:	0.RC5.2
+Release:	0.RC5.3
 Epoch:		1
 License:	distributable
 Group:		Applications/Graphics
@@ -113,9 +113,7 @@ COMPILED_BY="PLD/Linux Team";export COMPILED_BY;
 	--libdir=%{_datadir} \
 	--enable-pvm \
 	--with-pvm-arch=%{_pvmarch} \
-	--with-pvm-libs=%{_libdir} \
-	--x-includes=%{_includedir}/X11 \
-	--x-libraries=%{_libdir}
+	--with-pvm-libs=%{_libdir}
 %{__make}
 install unix/povray x-pvmpov
 %endif
@@ -135,9 +133,7 @@ install unix/povray pvmpov
 
 %if %{with x}
 %configure \
-	--libdir=%{_datadir} \
-	--x-includes=%{_includedir}/X11 \
-	--x-libraries=%{_libdir}
+	--libdir=%{_datadir}
 %{__make}
 install unix/povray x-povray
 %{__make} clean
@@ -148,15 +144,16 @@ install unix/povray x-povray
 	--without-x
 %{__make}
 
-
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_sysconfdir},%{_bindir}}
+install -d $RPM_BUILD_ROOT{%{_sysconfdir},%{_bindir},%{_datadir}}
 %if %{with pvm}
 install -d $RPM_BUILD_ROOT%{_pvmroot}/bin/%{_pvmarch}
 %endif
 
-%{__make} -j1 install \
+%{__make} install \
+	INSTALL="install -c -D" \
+	mkdir_p="mkdir -p" \
 	DESTDIR=$RPM_BUILD_ROOT
 
 %if %{with x}

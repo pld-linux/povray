@@ -4,19 +4,19 @@
 %bcond_with	pvm	# - with PVM support
 %bcond_with	svga	# - with svgalib support (doesn't work on many platforms)
 #
-%define		_src_pov_ver	3.7.0.RC3
+%define		_src_pov_ver	3.7.0.RC5
 
 Summary:	Persistence of Vision Ray Tracer
 Summary(pl.UTF-8):	Persistence of Vision Ray Tracer
 Name:		povray
 Version:	3.7.0
-Release:	0.RC3.2
+Release:	0.RC5.1
 Epoch:		1
 License:	distributable
 Group:		Applications/Graphics
 #Source0:	http://www.povray.org/ftp/pub/povray/Official/Unix/%{name}-%{_src_pov_ver}.tar.bz2
-Source0:	http://www.povray.org/redirect/www.povray.org/beta/source/%{name}-%{_src_pov_ver}.tar.bz2
-# Source0-md5:	66480f1ca6b1b1b5198605b6caf3f8e8
+Source0:	http://www.povray.org/redirect/www.povray.org/beta/source/%{name}-%{_src_pov_ver}.tar.gz
+# Source0-md5:	d272acba3c4116796b061703c0cfa97d
 # based on sources from CVS at http://pvmpov.sourceforge.net/
 # Source0:	%{name}-%{version}-%{snap}.tar.gz
 Source1:	%{name}-ax_boost_base.m4

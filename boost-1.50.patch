@@ -33,3 +33,14 @@
                    done
  
              fi
+--- povray-3.7.0.RC6/source/backend/scene/view.cpp~	2012-06-10 13:53:44.000000000 +0200
++++ povray-3.7.0.RC6/source/backend/scene/view.cpp	2012-07-11 12:01:21.696526975 +0200
+@@ -1550,7 +1550,7 @@
+ 	}
+ 
+ 	boost::xtime t;
+-	boost::xtime_get (&t, boost::TIME_UTC);
++	boost::xtime_get (&t, boost::TIME_UTC_);
+ 	t.sec += 3;
+ 
+ 	// this will cause us to wait until the other threads are done.

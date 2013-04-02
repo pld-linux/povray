@@ -136,7 +136,7 @@ install unix/povray pvmpov
 
 %if %{with x}
 %configure \
-	--libdir=%{_datadir} \
+	--libdir=%{_datadir}
 %{__make}
 install unix/povray x-povray
 %{__make} clean

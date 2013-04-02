@@ -4,25 +4,24 @@
 %bcond_with	pvm	# - with PVM support
 %bcond_with	svga	# - with svgalib support (doesn't work on many platforms)
 #
-%define		_rc		RC6
+%define		_rc		RC7
 %define		_src_pov_ver	3.7.0.%{_rc}
 
 Summary:	Persistence of Vision Ray Tracer
 Summary(pl.UTF-8):	Persistence of Vision Ray Tracer
 Name:		povray
 Version:	3.7.0
-Release:	0.%{_rc}.3
+Release:	0.%{_rc}.1
 Epoch:		1
 License:	distributable
 Group:		Applications/Graphics
 #Source0:	http://www.povray.org/ftp/pub/povray/Official/Unix/%{name}-%{_src_pov_ver}.tar.bz2
-Source0:	http://www.povray.org/redirect/www.povray.org/beta/source/%{name}-%{_src_pov_ver}.tar.gz
-# Source0-md5:	e441015262acfa60949082dbc7995493
+Source0:	http://www.povray.org/redirect/www.povray.org/beta/source/%{name}-%{_src_pov_ver}.tar.bz2
+# Source0-md5:	7d24ec051af67bcf040a898a267d920a
 # based on sources from CVS at http://pvmpov.sourceforge.net/
 # Source0:	%{name}-%{version}-%{snap}.tar.gz
 Source1:	%{name}-ax_boost_base.m4
 Patch0:		%{name}-nouserfiles.patch
-Patch1:		boost-1.50.patch
 URL:		http://www.povray.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -104,7 +103,6 @@ PVM/xwin.
 %setup -q -n %{name}-%{_src_pov_ver}
 cp %{SOURCE1} unix/config/ax_boost_base.m4
 %patch0 -p1
-%patch1 -p1
 
 %build
 %{__aclocal}

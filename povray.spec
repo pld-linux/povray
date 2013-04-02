@@ -112,6 +112,7 @@ COMPILED_BY="PLD/Linux Team";export COMPILED_BY;
 %if %{with x} && %{with pvm}
 %configure \
 	--libdir=%{_datadir} \
+	--with-boost-thread=boost_thread-mt \
 	--enable-pvm \
 	--with-pvm-arch=%{_pvmarch} \
 	--with-pvm-libs=%{_libdir}
@@ -124,6 +125,7 @@ install unix/povray x-pvmpov
 
 %configure \
 	--libdir=%{_datadir} \
+	--with-boost-thread=boost_thread-mt \
 	--enable-pvm \
 	--with-pvm-arch=%{_pvmarch} \
 	--with-pvm-libs=%{_libdir} \
@@ -134,7 +136,8 @@ install unix/povray pvmpov
 
 %if %{with x}
 %configure \
-	--libdir=%{_datadir}
+	--libdir=%{_datadir} \
+	--with-boost-thread=boost_thread-mt
 %{__make}
 install unix/povray x-povray
 %{__make} clean
@@ -142,6 +145,7 @@ install unix/povray x-povray
 
 %configure \
 	--libdir=%{_datadir} \
+	--with-boost-thread=boost_thread-mt \
 	--without-x
 %{__make}
 

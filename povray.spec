@@ -22,6 +22,7 @@ Source0:	http://www.povray.org/redirect/www.povray.org/beta/source/%{name}-%{_sr
 # Source0:	%{name}-%{version}-%{snap}.tar.gz
 Source1:	%{name}-ax_boost_base.m4
 Patch0:		%{name}-nouserfiles.patch
+Patch1:		boost-1.50.patch
 URL:		http://www.povray.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -103,6 +104,7 @@ PVM/xwin.
 %setup -q -n %{name}-%{_src_pov_ver}
 cp %{SOURCE1} unix/config/ax_boost_base.m4
 %patch0 -p1
+%patch1 -p1
 
 %build
 %{__aclocal}
@@ -112,7 +114,6 @@ COMPILED_BY="PLD/Linux Team";export COMPILED_BY;
 %if %{with x} && %{with pvm}
 %configure \
 	--libdir=%{_datadir} \
-	--with-boost-thread=boost_thread-mt \
 	--enable-pvm \
 	--with-pvm-arch=%{_pvmarch} \
 	--with-pvm-libs=%{_libdir}
@@ -125,7 +126,6 @@ install unix/povray x-pvmpov
 
 %configure \
 	--libdir=%{_datadir} \
-	--with-boost-thread=boost_thread-mt \
 	--enable-pvm \
 	--with-pvm-arch=%{_pvmarch} \
 	--with-pvm-libs=%{_libdir} \
@@ -137,7 +137,6 @@ install unix/povray pvmpov
 %if %{with x}
 %configure \
 	--libdir=%{_datadir} \
-	--with-boost-thread=boost_thread-mt
 %{__make}
 install unix/povray x-povray
 %{__make} clean
@@ -145,7 +144,6 @@ install unix/povray x-povray
 
 %configure \
 	--libdir=%{_datadir} \
-	--with-boost-thread=boost_thread-mt \
 	--without-x
 %{__make}
 

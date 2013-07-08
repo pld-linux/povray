@@ -6,12 +6,13 @@
 #
 %define		_rc		RC7
 %define		_src_pov_ver	3.7.0.%{_rc}
+%define		rel		3
 
 Summary:	Persistence of Vision Ray Tracer
 Summary(pl.UTF-8):	Persistence of Vision Ray Tracer
 Name:		povray
 Version:	3.7.0
-Release:	0.%{_rc}.2
+Release:	0.%{_rc}.%{rel}
 Epoch:		1
 License:	distributable
 Group:		Applications/Graphics

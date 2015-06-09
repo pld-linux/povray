@@ -6,7 +6,7 @@
 #
 %define		_rc		RC7
 %define		_src_pov_ver	3.7.0.%{_rc}
-%define		rel		8
+%define		rel		9
 
 Summary:	Persistence of Vision Ray Tracer
 Summary(pl.UTF-8):	Persistence of Vision Ray Tracer

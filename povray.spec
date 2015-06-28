@@ -15,8 +15,7 @@ Group:		Applications/Graphics
 Source0:	https://github.com/POV-Ray/povray/archive/v%{version}/%{name}-%{version}.tar.gz
 # Source0-md5:	c9473256677808e9e3246e6eb8f69a75
 Source1:	%{name}-ax_boost_base.m4
-Patch0:		%{name}-nouserfiles.patch
-Patch1:		boost-1.50.patch
+Patch0:		boost-1.50.patch
 URL:		http://www.povray.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -97,8 +96,7 @@ PVM/xwin.
 %prep
 %setup -q
 cp %{SOURCE1} unix/config/ax_boost_base.m4
-#%patch0 -p1
-%patch1 -p1
+%patch0 -p1
 
 %build
 cd unix

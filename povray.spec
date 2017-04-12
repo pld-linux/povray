@@ -4,18 +4,17 @@
 %bcond_with	pvm	# - with PVM support
 %bcond_with	svga	# - with svgalib support (doesn't work on many platforms)
 #
+%define	beta	beta.5
 Summary:	Persistence of Vision Ray Tracer
 Summary(pl.UTF-8):	Persistence of Vision Ray Tracer
 Name:		povray
-Version:	3.7.0.0
-Release:	3
+Version:	3.7.1
+Release:	0.%{beta}.1
 Epoch:		1
-License:	distributable
+License:	AGPLv3+
 Group:		Applications/Graphics
-Source0:	https://github.com/POV-Ray/povray/archive/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	c9473256677808e9e3246e6eb8f69a75
-Source1:	%{name}-ax_boost_base.m4
-Patch0:		boost-1.50.patch
+Source0:	https://github.com/POV-Ray/povray/archive/v%{version}-%{beta}/%{name}-%{version}-%{beta}.tar.gz
+# Source0-md5:	eeff460742acdaa84ebbc7e7e5135981
 URL:		http://www.povray.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -94,16 +93,13 @@ Plik wykonywalny The Persistence of Vision(tm) Ray-Tracer dla
 PVM/xwin.
 
 %prep
-%setup -q
-cp %{SOURCE1} unix/config/ax_boost_base.m4
-%patch0 -p1
+%setup -q -n %{name}-%{version}-%{beta}
 
 %build
 cd unix
 ./prebuild.sh
 cd ..
 
-%{__automake}
 COMPILED_BY="PLD/Linux Team";export COMPILED_BY;
 %if %{with x} && %{with pvm}
 %configure \

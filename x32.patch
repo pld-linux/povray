@@ -1,0 +1,11 @@
+--- povray-3.7.1-beta.5/unix/config/ax_boost_base.m4~	2017-03-25 14:56:03.000000000 +0100
++++ povray-3.7.1-beta.5/unix/config/ax_boost_base.m4	2017-04-13 10:17:17.072940712 +0200
+@@ -93,7 +93,7 @@
+     ax_arch=`uname -m`
+     case $ax_arch in
+       x86_64|ppc64|s390x|sparc64|aarch64)
+-        libsubdirs="lib64 lib lib64"
++        libsubdirs="libx32 lib64 lib lib64"
+         ;;
+     esac
+ 

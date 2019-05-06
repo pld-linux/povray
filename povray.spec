@@ -4,31 +4,40 @@
 %bcond_with	pvm	# - with PVM support
 %bcond_with	svga	# - with svgalib support (doesn't work on many platforms)
 #
-%define	rel	2
-%define	beta	beta.5
+%define	subver	rc.1
+%define	rel	1
 Summary:	Persistence of Vision Ray Tracer
 Summary(pl.UTF-8):	Persistence of Vision Ray Tracer
 Name:		povray
 Version:	3.7.1
-Release:	0.%{beta}.%{rel}
+Release:	0.%{subver}.%{rel}
 Epoch:		1
-License:	AGPLv3+
+License:	AGPL v3+
 Group:		Applications/Graphics
-Source0:	https://github.com/POV-Ray/povray/archive/v%{version}-%{beta}/%{name}-%{version}-%{beta}.tar.gz
-# Source0-md5:	eeff460742acdaa84ebbc7e7e5135981
-Patch0:		x32.patch
+#Source0Download: https://github.com/POV-Ray/povray/releases
+Source0:	https://github.com/POV-Ray/povray/archive/v%{version}-%{subver}/%{name}-%{version}-%{subver}.tar.gz
+# Source0-md5:	6445dd620d709ad4b394aca1e7d976cb
+Patch0:		%{name}-c++11.patch
+Patch1:		x32.patch
 URL:		http://www.povray.org/
-BuildRequires:	autoconf
-BuildRequires:	automake
-BuildRequires:	boost-devel
-BuildRequires:	libjpeg-devel
-BuildRequires:	libpng-devel >= 1.4.0
+BuildRequires:	OpenEXR-devel >= 1.2
+BuildRequires:	SDL-devel >= 1.2
+BuildRequires:	autoconf >= 2.59
+BuildRequires:	automake >= 1:1.9
+BuildRequires:	boost-devel >= 1.38
+BuildRequires:	libjpeg-devel >= 6b
+BuildRequires:	libpng-devel >= 2:1.4.0
 BuildRequires:	libstdc++-devel
-BuildRequires:	libtiff-devel
+BuildRequires:	libtiff-devel >= 3.6.1
+BuildRequires:	perl-base
 %{?with_pvm:BuildRequires:	pvm-devel >= 3.4.3-24}
 %{?with_svga:BuildRequires:	svgalib-devel}
 %{?with_x:BuildRequires:	xorg-lib-libX11-devel}
-BuildRequires:	zlib-devel
+BuildRequires:	zlib-devel >= 1.2.1
+Requires:	OpenEXR >= 1.2
+Requires:	SDL >= 1.2
+Requires:	libtiff >= 3.6.1
+Requires:	zlib >= 1.2.1
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %if %{with pvm}
@@ -96,9 +105,10 @@ Plik wykonywalny The Persistence of Vision(tm) Ray-Tracer dla
 PVM/xwin.
 
 %prep
-%setup -q -n %{name}-%{version}-%{beta}
-%ifarch x32
+%setup -q -n %{name}-%{version}-%{subver}
 %patch0 -p1
+%ifarch x32
+%patch1 -p1
 %endif
 
 %build
@@ -107,9 +117,11 @@ cd unix
 cd ..
 
 COMPILED_BY="PLD/Linux Team";export COMPILED_BY;
+# disable optimiz-arch, it means -march=native for gcc
 %if %{with x} && %{with pvm}
 %configure \
 	--libdir=%{_datadir} \
+	--disable-optimiz-arch \
 	--enable-pvm \
 	--with-pvm-arch=%{_pvmarch} \
 	--with-pvm-libs=%{_libdir}
@@ -122,6 +134,7 @@ install unix/povray x-pvmpov
 
 %configure \
 	--libdir=%{_datadir} \
+	--disable-optimiz-arch \
 	--enable-pvm \
 	--with-pvm-arch=%{_pvmarch} \
 	--with-pvm-libs=%{_libdir} \
@@ -132,7 +145,8 @@ install unix/povray pvmpov
 
 %if %{with x}
 %configure \
-	--libdir=%{_datadir}
+	--libdir=%{_datadir} \
+	--disable-optimiz-arch
 %{__make}
 install unix/povray x-povray
 %{__make} clean
@@ -140,6 +154,7 @@ install unix/povray x-povray
 
 %configure \
 	--libdir=%{_datadir} \
+	--disable-optimiz-arch \
 	--without-x
 %{__make}
 
@@ -169,9 +184,6 @@ install pvmpov $RPM_BUILD_ROOT%{_bindir}/pvmpov
 ln -s %{_bindir}/pvmpov $RPM_BUILD_ROOT%{_pvmroot}/bin/%{_pvmarch}/pvmpov
 %endif
 
-##install povray.ini $RPM_BUILD_ROOT%{_sysconfdir}
-##install povray.conf $RPM_BUILD_ROOT%{_sysconfdir}
-
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -181,11 +193,11 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/povray
 %{_datadir}/povray*
 %{_docdir}/povray*
-%{_mandir}/man?/*
+%{_mandir}/man1/povray.1*
 %dir %{_sysconfdir}/povray
 %dir %{_sysconfdir}/povray/3.7
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/3.7/povray.*
-## %config(noreplace) %verify(not md5 size mtime) %{_sysconfdir}/povray.*
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/3.7/povray.conf
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/3.7/povray.ini
 
 %if %{with x}
 %files X11

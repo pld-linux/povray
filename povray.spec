@@ -5,7 +5,7 @@
 %bcond_with	svga	# - with svgalib support (doesn't work on many platforms)
 #
 %define	subver	rc.1
-%define	rel	1
+%define	rel	2
 Summary:	Persistence of Vision Ray Tracer
 Summary(pl.UTF-8):	Persistence of Vision Ray Tracer
 Name:		povray

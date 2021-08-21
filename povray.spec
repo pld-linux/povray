@@ -4,20 +4,19 @@
 %bcond_with	pvm	# - with PVM support
 %bcond_with	svga	# - with svgalib support (doesn't work on many platforms)
 #
-%define	subver	rc.1
-%define	rel	4
+%define	subver	beta.2
+%define	rel	1
 Summary:	Persistence of Vision Ray Tracer
 Summary(pl.UTF-8):	Persistence of Vision Ray Tracer
 Name:		povray
-Version:	3.7.1
+Version:	3.8.0
 Release:	0.%{subver}.%{rel}
 Epoch:		1
 License:	AGPL v3+
 Group:		Applications/Graphics
 #Source0Download: https://github.com/POV-Ray/povray/releases
 Source0:	https://github.com/POV-Ray/povray/archive/v%{version}-%{subver}/%{name}-%{version}-%{subver}.tar.gz
-# Source0-md5:	6445dd620d709ad4b394aca1e7d976cb
-Patch0:		%{name}-c++11.patch
+# Source0-md5:	f253c837495da02189723059236e9434
 Patch1:		x32.patch
 URL:		http://www.povray.org/
 BuildRequires:	OpenEXR-devel >= 1.2
@@ -106,7 +105,6 @@ PVM/xwin.
 
 %prep
 %setup -q -n %{name}-%{version}-%{subver}
-%patch0 -p1
 %ifarch x32
 %patch1 -p1
 %endif

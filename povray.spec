@@ -44,6 +44,8 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_pvmroot	/usr/%{_lib}/pvm3
 %endif
 
+%define		specflags	-std=c++11
+
 %description
 The Persistence of Vision(tm) Ray-Tracer creates three-dimensional,
 photo-realistic images using a rendering technique called ray-tracing.
@@ -120,6 +122,7 @@ COMPILED_BY="PLD/Linux Team";export COMPILED_BY;
 %configure \
 	--libdir=%{_datadir} \
 	--disable-optimiz-arch \
+	--disable-strip \
 	--enable-pvm \
 	--with-pvm-arch=%{_pvmarch} \
 	--with-pvm-libs=%{_libdir}
@@ -133,6 +136,7 @@ install unix/povray x-pvmpov
 %configure \
 	--libdir=%{_datadir} \
 	--disable-optimiz-arch \
+	--disable-strip \
 	--enable-pvm \
 	--with-pvm-arch=%{_pvmarch} \
 	--with-pvm-libs=%{_libdir} \
@@ -144,7 +148,8 @@ install unix/povray pvmpov
 %if %{with x}
 %configure \
 	--libdir=%{_datadir} \
-	--disable-optimiz-arch
+	--disable-optimiz-arch \
+	--disable-strip
 %{__make}
 install unix/povray x-povray
 %{__make} clean
@@ -153,6 +158,7 @@ install unix/povray x-povray
 %configure \
 	--libdir=%{_datadir} \
 	--disable-optimiz-arch \
+	--disable-strip \
 	--without-x
 %{__make}
 
@@ -193,9 +199,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/povray*
 %{_mandir}/man1/povray.1*
 %dir %{_sysconfdir}/povray
-%dir %{_sysconfdir}/povray/3.7
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/3.7/povray.conf
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/3.7/povray.ini
+%dir %{_sysconfdir}/povray/3.8
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/3.8/povray.conf
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/3.8/povray.ini
 
 %if %{with x}
 %files X11

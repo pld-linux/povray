@@ -108,7 +108,7 @@ PVM/xwin.
 %prep
 %setup -q -n %{name}-%{version}-%{subver}
 %ifarch x32
-%patch1 -p1
+%patch -P1 -p1
 %endif
 
 %build
